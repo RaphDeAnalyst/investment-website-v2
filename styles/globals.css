@@ -1,0 +1,395 @@
+/* styles/globals.css - Enhanced Mobile Responsive Version */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  font-family: system-ui, -apple-system, sans-serif;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: rgb(249 250 251);
+  color: rgb(17 24 39);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Custom responsive button styles */
+.btn-primary {
+  @apply bg-blue-600 text-white px-4 py-2 rounded-lg border-0 cursor-pointer transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+.btn-secondary {
+  @apply bg-gray-100 text-gray-700 px-4 py-2 rounded-lg border border-gray-300 cursor-pointer transition-colors hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+}
+
+/* Enhanced responsive input fields */
+.input-field {
+  @apply block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500;
+}
+
+/* Mobile-specific container classes */
+.container-responsive {
+  @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.container-narrow {
+  @apply w-full max-w-2xl mx-auto px-4 sm:px-6;
+}
+
+/* Dashboard card layouts */
+.dashboard-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6;
+}
+
+.portfolio-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6;
+}
+
+.action-buttons-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4;
+}
+
+/* Card components */
+.card-base {
+  @apply bg-white rounded-xl shadow-sm border border-gray-200 transition-shadow hover:shadow-md;
+}
+
+.summary-card {
+  @apply bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200 transition-all hover:shadow-md;
+}
+
+.investment-card {
+  @apply bg-gray-50 rounded-xl p-4 sm:p-6 cursor-pointer transition-all hover:bg-gray-100 border-2 border-transparent hover:border-blue-200;
+}
+
+/* Navigation responsive styles */
+.nav-main {
+  @apply bg-white shadow-sm border-b border-gray-200;
+}
+
+.nav-container {
+  @apply container-responsive flex h-16 justify-between items-center;
+}
+
+.nav-logo {
+  @apply text-lg sm:text-xl font-bold text-gray-900;
+}
+
+.nav-links {
+  @apply hidden md:flex md:items-center md:space-x-8;
+}
+
+.nav-link {
+  @apply text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors;
+}
+
+/* Mobile menu styles */
+.mobile-menu {
+  @apply md:hidden px-4 pt-2 pb-3 space-y-1 bg-white shadow-lg border-t border-gray-200;
+}
+
+.mobile-menu-item {
+  @apply text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium transition-colors;
+}
+
+/* Form layouts */
+.form-container {
+  @apply w-full max-w-md mx-auto;
+}
+
+.form-group {
+  @apply mb-4;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700 mb-2;
+}
+
+.form-input {
+  @apply input-field;
+}
+
+.form-textarea {
+  @apply block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none;
+}
+
+/* Modal responsive styles */
+.modal-overlay {
+  @apply fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4;
+}
+
+.modal-container {
+  @apply bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto;
+}
+
+.modal-header {
+  @apply flex items-center justify-between p-4 sm:p-6 border-b border-gray-200;
+}
+
+.modal-body {
+  @apply p-4 sm:p-6;
+}
+
+.modal-footer {
+  @apply p-4 sm:p-6 border-t border-gray-200 flex flex-col sm:flex-row gap-3 sm:justify-end;
+}
+
+/* Welcome section styles */
+.welcome-section {
+  @apply text-center px-4 sm:px-6;
+}
+
+.welcome-icon {
+  @apply w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4 sm:mb-6;
+}
+
+.welcome-title {
+  @apply text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4;
+}
+
+.welcome-subtitle {
+  @apply text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto;
+}
+
+/* Stats grid */
+.stats-grid {
+  @apply grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8;
+}
+
+.stat-item {
+  @apply text-center;
+}
+
+.stat-number {
+  @apply text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2;
+}
+
+.stat-label {
+  @apply text-sm sm:text-base text-gray-600;
+}
+
+/* Responsive text utilities */
+.text-responsive-lg {
+  @apply text-lg sm:text-xl lg:text-2xl;
+}
+
+.text-responsive-xl {
+  @apply text-xl sm:text-2xl lg:text-3xl;
+}
+
+.text-responsive-2xl {
+  @apply text-2xl sm:text-3xl lg:text-4xl;
+}
+
+/* Authentication forms */
+.auth-container {
+  @apply min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8;
+}
+
+.auth-card {
+  @apply mt-8 sm:mx-auto sm:w-full sm:max-w-md bg-white py-8 px-4 shadow-xl rounded-lg sm:px-10;
+}
+
+.auth-tabs {
+  @apply flex mb-8 bg-gray-100 rounded-lg p-1;
+}
+
+.auth-tab {
+  @apply flex-1 py-2 px-4 text-sm font-medium rounded-md transition-all cursor-pointer;
+}
+
+.auth-tab-active {
+  @apply bg-white text-gray-900 shadow-sm;
+}
+
+.auth-tab-inactive {
+  @apply text-gray-500 hover:text-gray-700;
+}
+
+/* Investment plan cards */
+.plan-card {
+  @apply bg-white rounded-xl p-6 shadow-sm border-2 border-gray-200 transition-all hover:border-blue-500 hover:shadow-lg;
+}
+
+.plan-header {
+  @apply flex flex-col sm:flex-row sm:justify-between sm:items-start mb-6 gap-3;
+}
+
+.plan-title {
+  @apply text-lg sm:text-xl font-bold text-gray-900;
+}
+
+.plan-badge {
+  @apply px-3 py-1 rounded-full text-xs font-semibold uppercase w-fit;
+}
+
+.plan-details-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6;
+}
+
+/* Profile page styles */
+.profile-container {
+  @apply min-h-screen bg-gray-50;
+}
+
+.profile-main {
+  @apply container-responsive py-8;
+}
+
+.profile-header {
+  @apply mb-8;
+}
+
+.profile-title {
+  @apply text-2xl sm:text-3xl font-bold text-gray-900 mb-2;
+}
+
+.profile-subtitle {
+  @apply text-gray-600;
+}
+
+.profile-grid {
+  @apply grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8;
+}
+
+.profile-sidebar {
+  @apply lg:col-span-1;
+}
+
+.profile-content {
+  @apply lg:col-span-2;
+}
+
+.profile-nav {
+  @apply bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden;
+}
+
+.profile-nav-item {
+  @apply flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-200 last:border-b-0;
+}
+
+.profile-nav-item-active {
+  @apply bg-blue-50 text-blue-700 border-r-2 border-blue-500;
+}
+
+/* Avatar styles */
+.avatar-container {
+  @apply relative inline-block;
+}
+
+.avatar-image {
+  @apply w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-gray-200;
+}
+
+.avatar-placeholder {
+  @apply w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg sm:text-xl border-2 border-gray-200;
+}
+
+/* Loading states */
+.loading-spinner {
+  @apply inline-block w-5 h-5 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin;
+}
+
+.loading-container {
+  @apply flex items-center justify-center min-h-[200px];
+}
+
+/* Error states */
+.error-container {
+  @apply text-center py-12;
+}
+
+.error-icon {
+  @apply w-16 h-16 mx-auto mb-4 text-red-500;
+}
+
+.error-title {
+  @apply text-lg sm:text-xl font-semibold text-gray-900 mb-2;
+}
+
+.error-message {
+  @apply text-gray-600 mb-6 max-w-md mx-auto;
+}
+
+/* Homepage specific responsive styles */
+.hero-section {
+  @apply pt-16 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8;
+}
+
+.hero-grid {
+  @apply grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center max-w-6xl mx-auto;
+}
+
+.hero-content {
+  @apply text-center lg:text-left order-2 lg:order-1;
+}
+
+.hero-auth {
+  @apply w-full max-w-md mx-auto lg:max-w-none order-1 lg:order-2;
+}
+
+/* Section spacing */
+.section-padding {
+  @apply py-12 sm:py-16 lg:py-24;
+}
+
+/* Responsive utilities */
+@media (max-width: 640px) {
+  .hide-on-mobile {
+    display: none !important;
+  }
+  
+  .mobile-full-width {
+    width: 100% !important;
+  }
+  
+  .mobile-center {
+    text-align: center !important;
+  }
+  
+  /* Force mobile layout fixes */
+  .mobile-stack {
+    flex-direction: column !important;
+  }
+  
+  .mobile-padding {
+    padding: 1rem !important;
+  }
+}
+
+@media (min-width: 641px) {
+  .hide-on-desktop {
+    display: none !important;
+  }
+}
+
+/* Focus states for accessibility */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+/* Transition utilities */
+.transition-base {
+  @apply transition-all duration-200 ease-in-out;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Dark mode support (if needed later) */
+@media (prefers-color-scheme: dark) {
+  .dark-mode-support {
+    /* Add dark mode styles here if needed */
+  }
+}
