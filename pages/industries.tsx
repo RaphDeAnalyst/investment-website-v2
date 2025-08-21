@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Head from 'next/head'
 import Link from 'next/link'
 import { ChatWidget } from '../components/ChatWidget'
 
@@ -155,18 +156,26 @@ export default function ExpertisePage() {
   const currentExpertise = expertiseData[activeExpertise as keyof typeof expertiseData]
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
+      <Head>
+        <title>Investment Industries - Everest Global Holdings</title>
+        <meta name="description" content="Explore our investment expertise across Oil & Gas, Real Estate, Stocks, AI Arbitrage, Agriculture, and Gold Mining sectors." />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+
+      <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
        <nav className="fixed w-full top-0 bg-white/95 backdrop-blur-sm shadow-sm z-50 border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-20">
+            <div className="flex justify-between items-center h-16">
               {/* Logo - Bigger than homepage */}
               <div className="flex items-center">
                 <Link href="/" className="flex items-center gap-3 no-underline">
                   <img 
                     src="/logo.png" 
                     alt="Everest Global Holdings Logo" 
-                    className="h-16 w-auto"
+                    className="h-12 w-auto"
                     onError={(e) => {
                       // First fallback
                       if (e.currentTarget.src !== "/everest-logo.png") {
@@ -179,10 +188,10 @@ export default function ExpertisePage() {
                       }
                     }}
                   />
-                  <div className="w-14 h-14 bg-blue-600 rounded-xl items-center justify-center hidden">
+                  <div className="w-14 h-4 bg-blue-600 rounded-xl items-center justify-center hidden">
                     <span className="text-white font-bold text-2xl">E</span>
                   </div>
-                  <div className="text-2xl font-bold text-gray-900">
+                  <div className="text-1xl font-bold text-gray-900">
                     Everest <span className="text-gray-600">Global Holdings</span>
                   </div>
                 </Link>
@@ -191,6 +200,9 @@ export default function ExpertisePage() {
               {/* Desktop Navigation */}
               <div className="hidden md:flex items-center space-x-8">
                 <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Home</Link>
+                <Link href="/about" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">About Us</Link>
+                <Link href="/plans" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Investment Plans</Link>
+                <Link href="/industries" className="text-blue-600 hover:text-blue-700 font-medium transition-colors">Industries</Link>
                  <button
                   onClick={() => setContactFormOpen(true)}
                   className="text-gray-700 hover:text-gray-900 font-medium transition-colors bg-transparent border-0 cursor-pointer"
@@ -199,12 +211,27 @@ export default function ExpertisePage() {
                 </button>
               </div>
               
-              {/* CTA Buttons */}
-              <div className="flex items-center space-x-4">
-                <Link href="/signin" className="hidden sm:block text-gray-700 hover:text-gray-900 font-medium transition-colors">
+              {/* Mobile menu button */}
+              <div className="md:hidden flex items-center space-x-4">
+                <Link href="/signin" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">
                   Sign In
                 </Link>
-                <Link href="/signup" className="bg-blue-600 text-white px-6 py-3 rounded-2xl hover:bg-blue-700 font-medium transition-colors">
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="text-gray-700 hover:text-gray-900 p-2"
+                >
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </button>
+              </div>
+              
+              {/* CTA Buttons */}
+              <div className="hidden md:flex items-center space-x-4">
+                <Link href="/signin" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">
+                  Sign In
+                </Link>
+                <Link href="/signup" className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 font-medium transition-colors">
                   Get Started
                 </Link>
               </div>
@@ -212,8 +239,32 @@ export default function ExpertisePage() {
           </div>
         </nav>
 
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-white border-t border-gray-200 px-4 py-6">
+            <div className="flex flex-col space-y-4">
+              <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>Home</Link>
+              <Link href="/about" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>About Us</Link>
+              <Link href="/plans" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>Investment Plans</Link>
+              <Link href="/industries" className="text-blue-600 hover:text-blue-700 font-medium" onClick={() => setMobileMenuOpen(false)}>Industries</Link>
+              <button
+                onClick={() => {
+                  setContactFormOpen(true)
+                  setMobileMenuOpen(false)
+                }}
+                className="text-left text-gray-700 hover:text-gray-900 font-medium bg-transparent border-0 cursor-pointer p-0"
+              >
+                Contact
+              </button>
+              <Link href="/signup" className="bg-blue-600 text-white px-6 py-3 rounded-2xl hover:bg-blue-700 font-medium transition-colors text-center" onClick={() => setMobileMenuOpen(false)}>
+                Get Started
+              </Link>
+            </div>
+          </div>
+        )}
+
       {/* Hero Section */}
-      <section className="pt-24 pb-12 bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900 text-white">
+      <section className="py-20 bg-gray-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl lg:text-5xl font-bold mb-6">
             Our Investment Expertise
@@ -238,7 +289,7 @@ export default function ExpertisePage() {
                   onClick={() => setActiveExpertise(key)}
                   className={`flex items-center space-x-2 px-4 sm:px-6 py-3 rounded-lg font-medium transition-all whitespace-nowrap ${
                     isActive 
-                      ? 'bg-blue-400 text-white shadow-lg' 
+                      ? 'bg-blue-600 text-white shadow-lg' 
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -357,7 +408,7 @@ export default function ExpertisePage() {
       </section>
 
       {/* Additional CTA Section */}
-      <section className="py-16 bg-blue-600 text-white">
+      <section className="py-20 bg-gray-600 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-6">
             Diversify Your Portfolio Across Multiple Sectors
@@ -402,10 +453,7 @@ export default function ExpertisePage() {
               }
             }}
           />
-          <div className="w-8 h-8 bg-blue-600 rounded-lg items-center justify-center mr-2 hidden">
-            <span className="text-white font-bold">E</span>
-          </div>
-          <div className="text-lg font-bold">Everest Global Holdings</div>
+        
         </div>
         <div className="text-sm text-gray-600">
           20-22 Wenlock Road, London, N1 7GU England
@@ -509,6 +557,7 @@ export default function ExpertisePage() {
       )}
 
       <ChatWidget />
-    </div>
+      </div>
+    </>
   )
 }

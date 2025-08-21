@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import { createSupabaseClient } from '../lib/supabase'
+import { useGlobalPopup } from '../components/ui/PopupProvider'
 import toast from 'react-hot-toast'
 
 interface PendingInvestment {
@@ -42,6 +43,7 @@ export default function AdminPanel() {
   
   const router = useRouter()
   const supabase = createSupabaseClient()
+  const { showSuccess, showError, showConfirm } = useGlobalPopup()
 
   const isAdmin = (email: string) => {
     const adminEmails = [
@@ -475,7 +477,30 @@ export default function AdminPanel() {
                 {user?.email}
               </span>
               <button
-                onClick={() => supabase.auth.signOut()}
+                onClick={() => {
+                  showConfirm(
+                    'Confirm Logout',
+                    'Are you sure you want to logout from the admin panel?',
+                    async () => {
+                      try {
+                        await supabase.auth.signOut();
+                        showSuccess(
+                          'Logged Out',
+                          'You have been successfully logged out. Redirecting...',
+                          2000
+                        )
+                        setTimeout(() => {
+                          router.push('/');
+                        }, 2000)
+                      } catch (error) {
+                        showError(
+                          'Logout Failed',
+                          'Failed to logout. Please try again.'
+                        )
+                      }
+                    }
+                  )
+                }}
                 style={{
                   padding: '8px 16px',
                   backgroundColor: '#374151',

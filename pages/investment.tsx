@@ -5,6 +5,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { createSupabaseClient } from '../lib/supabase'
 import { ChatWidget } from '../components/ChatWidget'
+import { useGlobalPopup } from '../components/ui/PopupProvider'
 import toast from 'react-hot-toast'
 
 interface InvestmentPlan {
@@ -56,6 +57,7 @@ export default function Investment() {
   
   const router = useRouter()
   const supabase = createSupabaseClient()
+  const { showSuccess, showError, showConfirm } = useGlobalPopup()
 
   const investmentPlans: InvestmentPlan[] = [
     {
@@ -280,7 +282,11 @@ export default function Investment() {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
-    toast.success('Address copied to clipboard!')
+    showSuccess(
+      'Address Copied',
+      'Payment address has been copied to your clipboard.',
+      2000
+    )
   }
 
   // Helper function to safely parse and format numbers
@@ -310,7 +316,10 @@ export default function Investment() {
     
     if (!calculator.selectedPlan) {
       console.log('❌ Missing required data')
-      toast.error('Missing investment plan data')
+      showError(
+        'Payment Failed',
+        'Missing investment plan data. Please select a plan and try again.'
+      )
       return
     }
 
@@ -319,7 +328,10 @@ export default function Investment() {
 
     if (finalAmount < 1) {
       console.log('❌ Amount too small')
-      toast.error('Please enter a valid payment amount')
+      showError(
+        'Invalid Amount',
+        'Please enter a valid payment amount greater than $1.'
+      )
       return
     }
 
@@ -367,12 +379,17 @@ export default function Investment() {
       }
       
       console.log('✅ Payment submitted successfully!')
-      toast.success('Payment submitted successfully! Awaiting admin confirmation.')
       
       // Reset states and redirect
       setPayment({ isOpen: false, selectedMethod: '', step: 'method', btcRate: 0, loading: false })
       setPaymentForm({ transactionHash: '', customAmount: '' })
       setCalculator({ selectedPlan: null, amount: '', isOpen: false })
+      
+      showSuccess(
+        'Payment Submitted!',
+        'Your investment has been submitted successfully and is awaiting admin confirmation. You will be redirected to your dashboard.',
+        4000
+      )
       
       // Wait a moment before redirecting to let the user see the success message
       setTimeout(() => {
@@ -382,7 +399,10 @@ export default function Investment() {
     } catch (error: any) {
       console.error('❌ Payment submission error:', error)
       const errorMessage = error?.message || 'Failed to submit payment. Please try again.'
-      toast.error(errorMessage)
+      showError(
+        'Payment Failed',
+        errorMessage
+      )
       setPayment(prev => ({ ...prev, loading: false }))
     }
   }
@@ -478,12 +498,29 @@ export default function Investment() {
               {/* Logout Button */}
               <div className="flex-shrink-0 px-2 pb-4">
                 <button
-                  onClick={async () => {
-                    const confirmed = window.confirm('Are you sure you want to logout?');
-                    if (confirmed) {
-                      await supabase.auth.signOut();
-                      window.location.href = '/';
-                    }
+                  onClick={() => {
+                    showConfirm(
+                      'Confirm Logout',
+                      'Are you sure you want to logout?',
+                      async () => {
+                        try {
+                          await supabase.auth.signOut();
+                          showSuccess(
+                            'Logged Out',
+                            'You have been successfully logged out. Redirecting...',
+                            2000
+                          )
+                          setTimeout(() => {
+                            window.location.href = '/';
+                          }, 2000)
+                        } catch (error) {
+                          showError(
+                            'Logout Failed',
+                            'Failed to logout. Please try again.'
+                          )
+                        }
+                      }
+                    )
                   }}
                   className="w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md"
                 >

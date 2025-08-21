@@ -110,14 +110,14 @@ export default function SignUpPage() {
               <p className="text-xs text-slate-500 leading-relaxed">
                 By signing up, you agree to our{' '}
                 <a 
-                  href="#" 
+                  href="/terms" 
                   className="text-slate-800 hover:text-slate-600 transition-colors underline"
                 >
                   Terms of Service
                 </a>{' '}
                 and{' '}
                 <a 
-                  href="#" 
+                  href="/privacy" 
                   className="text-slate-800 hover:text-slate-600 transition-colors underline"
                 >
                   Privacy Policy

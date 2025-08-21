@@ -6,6 +6,7 @@ import { TrendingUp, Shield, Users, Star, Award, Target, Zap, Globe } from 'luci
 import { ChatWidget } from '../components/ChatWidget'
 
 export default function AboutPage() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [contactFormOpen, setContactFormOpen] = useState(false)
   const [contactForm, setContactForm] = useState({
     name: '',
@@ -70,10 +71,26 @@ export default function AboutPage() {
               {/* Logo */}
               <div className="flex items-center">
                 <Link href="/" className="flex items-center gap-2 no-underline">
-                  <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">E</span>
+                  <img 
+                    src="/logo.png" 
+                    alt="Everest Global Holdings Logo" 
+                    className="h-12 w-auto"
+                    onError={(e) => {
+                      // First fallback
+                      if (e.currentTarget.src !== "/everest-logo.png") {
+                        e.currentTarget.src = "/everest-logo.png"
+                      } else {
+                        // Final fallback to company initials
+                        e.currentTarget.style.display = 'none';
+                        const fallbackElement = e.currentTarget.nextElementSibling as HTMLElement;
+                        if (fallbackElement) fallbackElement.style.display = 'flex';
+                      }
+                    }}
+                  />
+                  <div className="w-14 h-14 bg-blue-600 rounded-xl items-center justify-center hidden">
+                    <span className="text-white font-bold text-2xl">E</span>
                   </div>
-                  <div className="text-xl font-bold text-gray-900">
+                  <div className="text-1xl font-bold text-gray-900">
                     Everest <span className="text-gray-600">Global Holdings</span>
                   </div>
                 </Link>
@@ -83,8 +100,8 @@ export default function AboutPage() {
               <div className="hidden md:flex items-center space-x-8">
                 <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Home</Link>
                 <Link href="/about" className="text-blue-600 hover:text-blue-700 font-medium transition-colors">About Us</Link>
-                <Link href="#services" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Services</Link>
-                <Link href="#portfolio" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Portfolio</Link>
+                <Link href="/plans" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Plans</Link>
+                <Link href="/industries" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Industries</Link>
                 <button
                   onClick={() => setContactFormOpen(true)}
                   className="text-gray-700 hover:text-gray-900 font-medium transition-colors bg-transparent border-0 cursor-pointer"
@@ -95,21 +112,64 @@ export default function AboutPage() {
               
               {/* CTA Buttons */}
               <div className="flex items-center space-x-4">
-                <Link href="/signin" className="hidden sm:block text-gray-700 hover:text-gray-900 font-medium transition-colors">
+                <div className="hidden md:flex items-center space-x-4">
+                  <Link href="/signin" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">
+                    Sign In
+                  </Link>
+                  <Link href="/signup" className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 font-medium transition-colors">
+                    Get Started
+                  </Link>
+                </div>
+                
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="md:hidden text-gray-700 hover:text-gray-900 bg-transparent border-0 cursor-pointer"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {mobileMenuOpen ? (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    ) : (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    )}
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden bg-white border-t border-gray-200 px-4 py-6">
+              <div className="flex flex-col space-y-4">
+                <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>Home</Link>
+                <Link href="/about" className="text-blue-600 hover:text-blue-700 font-medium" onClick={() => setMobileMenuOpen(false)}>About Us</Link>
+                <Link href="/plans" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>Plans</Link>
+                <Link href="/industries" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>Industries</Link>
+                <button
+                  onClick={() => {
+                    setContactFormOpen(true)
+                    setMobileMenuOpen(false)
+                  }}
+                  className="text-gray-700 hover:text-gray-900 font-medium text-left bg-transparent border-0 cursor-pointer"
+                >
+                  Contact
+                </button>
+                <hr className="border-gray-200" />
+                <Link href="/signin" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>
                   Sign In
                 </Link>
-                <Link href="/signup" className="bg-blue-600 text-white px-6 py-2 rounded-2xl hover:bg-blue-700 font-medium transition-colors">
+                <Link href="/signup" className="bg-blue-600 text-white px-4 py-2 rounded-2xl hover:bg-blue-700 font-medium text-center" onClick={() => setMobileMenuOpen(false)}>
                   Get Started
                 </Link>
               </div>
             </div>
-          </div>
+          )}
         </nav>
 
         {/* Main Content */}
         <main className="pt-20">
           {/* Hero Section */}
-          <section className="py-20 bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900 text-white">
+          <section className="py-20 bg-gray-600 text-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center">
                 <h1 className="text-4xl lg:text-6xl font-bold mb-6 leading-tight">
@@ -328,8 +388,8 @@ export default function AboutPage() {
                 </div>
 
                 <div className="bg-white rounded-2xl p-10 shadow-lg hover:shadow-xl transition-all hover:-translate-y-2 border border-gray-200 text-center">
-                  <div className="w-20 h-20 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Globe size={36} className="text-teal-600" />
+                  <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Globe size={36} className="text-blue-600" />
                   </div>
                   <h3 className="text-2xl font-semibold text-gray-900 mb-4">
                     Our Vision
@@ -417,43 +477,51 @@ export default function AboutPage() {
 
         {/* Footer */}
         <footer className="bg-gray-100 text-gray-800 py-8">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-              {/* Logo and Company Info */}
-              <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4">
-                <div className="flex items-center">
-                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-2">
-                    <span className="text-white font-bold">E</span>
-                  </div>
-                  <div className="text-lg font-bold">Everest Global Holdings</div>
-                </div>
-                
-                {/* Address */}
-                <div className="text-sm text-gray-600">
-                  20-22 Wenlock Road, London, N1 7GU England
-                </div>
-              </div>
-              
-              {/* Legal Links */}
-              <div className="flex items-center space-x-6 text-sm">
-                <Link href="/privacy" className="text-gray-600 hover:text-gray-800 transition-colors">
-                  Privacy Policy
-                </Link>
-                <span className="text-gray-400">/</span>
-                <Link href="/terms" className="text-gray-600 hover:text-gray-800 transition-colors">
-                  Terms of Use
-                </Link>
-              </div>
-            </div>
-            
-            {/* Copyright */}
-            <div className="mt-6 pt-4 border-t border-gray-300 text-center">
-              <p className="text-sm text-gray-600">
-                &copy; 2025 Everest Global Holdings. All rights reserved.
-              </p>
-            </div>
-          </div>
-        </footer>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+      <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4">
+        <div className="flex items-center">
+          <img 
+            src="/logo.png" 
+            alt="Everest Global Holdings Logo" 
+            className="h-16 w-auto mr-2"
+            onError={(e) => {
+              // First fallback
+              if (e.currentTarget.src !== "/everest-logo.png") {
+                e.currentTarget.src = "/everest-logo.png"
+              } else {
+                // Final fallback to company initials
+                e.currentTarget.style.display = 'none';
+                const fallbackElement = e.currentTarget.nextElementSibling as HTMLElement;
+                if (fallbackElement) fallbackElement.style.display = 'flex';
+              }
+            }}
+          />
+        
+        </div>
+        <div className="text-sm text-gray-600">
+          20-22 Wenlock Road, London, N1 7GU England
+        </div>
+      </div>
+      
+      <div className="flex items-center space-x-6 text-sm">
+        <Link href="/privacy" className="text-gray-600 hover:text-gray-800 transition-colors">
+          Privacy Policy
+        </Link>
+        <span className="text-gray-400">/</span>
+        <Link href="/terms" className="text-gray-600 hover:text-gray-800 transition-colors">
+          Terms of Use
+        </Link>
+      </div>
+    </div>
+    
+    <div className="mt-6 pt-4 border-t border-gray-300 text-center">
+      <p className="text-sm text-gray-600">
+        &copy; 2025 Everest Global Holdings. All rights reserved.
+      </p>
+    </div>
+  </div>
+</footer>
 
         {/* Contact Form Modal */}
         {contactFormOpen && (

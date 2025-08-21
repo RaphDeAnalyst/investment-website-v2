@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Link from 'next/link'
 import { createSupabaseClient } from '../lib/supabase'
+import { useGlobalPopup } from '../components/ui/PopupProvider'
 import toast from 'react-hot-toast'
 
 interface WithdrawalForm {
@@ -31,6 +32,7 @@ export default function Withdraw() {
   
   const router = useRouter()
   const supabase = createSupabaseClient()
+  const { showSuccess, showError, showConfirm } = useGlobalPopup()
 
   const paymentMethods: Record<string, {
     name: string;
@@ -119,7 +121,10 @@ export default function Withdraw() {
       }
     } catch (error) {
       console.error('Error fetching user data:', error)
-      toast.error('Failed to load user data')
+      showError(
+        'Failed to Load Data',
+        'Unable to load your account information. Please refresh the page and try again.'
+      )
     }
   }
 
@@ -161,7 +166,10 @@ export default function Withdraw() {
     e.preventDefault()
     
     if (!isValidAmount() || !form.paymentMethod || !form.walletAddress) {
-      toast.error('Please fill in all required fields')
+      showError(
+        'Incomplete Form',
+        'Please fill in all required fields: amount, payment method, and wallet address.'
+      )
       return
     }
 
@@ -180,8 +188,6 @@ export default function Withdraw() {
 
       if (error) throw error
 
-      toast.success('Withdrawal request submitted successfully!')
-      
       // Reset form
       setForm({
         amount: '',
@@ -189,12 +195,23 @@ export default function Withdraw() {
         walletAddress: ''
       })
       
+      showSuccess(
+        'Withdrawal Submitted!',
+        'Your withdrawal request has been submitted successfully and is being processed. You will be redirected to your dashboard.',
+        3000
+      )
+      
       // Redirect to dashboard
-      router.push('/dashboard')
+      setTimeout(() => {
+        router.push('/dashboard')
+      }, 3000)
       
     } catch (error) {
       console.error('Error submitting withdrawal:', error)
-      toast.error('Failed to submit withdrawal request')
+      showError(
+        'Withdrawal Failed',
+        'Failed to submit withdrawal request. Please check your information and try again.'
+      )
     } finally {
       setSubmitting(false)
     }
@@ -286,12 +303,29 @@ export default function Withdraw() {
               {/* Logout Button */}
               <div className="flex-shrink-0 px-2 pb-4">
                 <button
-                  onClick={async () => {
-                    const confirmed = window.confirm('Are you sure you want to logout?');
-                    if (confirmed) {
-                      await supabase.auth.signOut();
-                      window.location.href = '/';
-                    }
+                  onClick={() => {
+                    showConfirm(
+                      'Confirm Logout',
+                      'Are you sure you want to logout?',
+                      async () => {
+                        try {
+                          await supabase.auth.signOut();
+                          showSuccess(
+                            'Logged Out',
+                            'You have been successfully logged out. Redirecting...',
+                            2000
+                          )
+                          setTimeout(() => {
+                            window.location.href = '/';
+                          }, 2000)
+                        } catch (error) {
+                          showError(
+                            'Logout Failed',
+                            'Failed to logout. Please try again.'
+                          )
+                        }
+                      }
+                    )
                   }}
                   className="w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md"
                 >

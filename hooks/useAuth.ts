@@ -86,23 +86,33 @@ export function useAuth() {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event: AuthChangeEvent, session: Session | null) => {
-        console.log('🔄 Auth state changed:', event, !!session?.user)
-        
-        if (mounted) {
-          setUser(session?.user ?? null)
-          setError(null)
+        async (event: AuthChangeEvent, session: Session | null) => {
+          console.log('🔄 Auth state changed:', event, !!session?.user)
           
-          // Only try to fetch profile if we have a user
-          if (session?.user) {
-            await fetchProfile(session.user.id)
-          } else {
-            setProfile(null)
+          if (mounted) {
+            setUser(session?.user ?? null)
+            setError(null)
+            
+            // Handle email verification
+            if (event === 'SIGNED_IN' && session?.user) {
+              if (session.user.email_confirmed_at) {
+                // Email is verified, proceed normally
+                await fetchProfile(session.user.id)
+              } else {
+                // Email not verified, redirect to verification page
+                if (typeof window !== 'undefined') {
+                  window.location.href = `/verify-email?email=${encodeURIComponent(session.user.email || '')}`
+                }
+                return
+              }
+            } else if (session?.user) {
+              await fetchProfile(session.user.id)
+            } else {
+              setProfile(null)
+            }
           }
         }
-      }
-    )
-
+      )
     return () => {
       mounted = false
       subscription.unsubscribe()
@@ -168,7 +178,6 @@ export function useAuth() {
 
       if (data.user) {
         console.log('✅ Sign up successful')
-        toast.success('Account created successfully!')
         return { data, error: null }
       } else {
         throw new Error('Sign up failed - no user returned')
@@ -177,7 +186,6 @@ export function useAuth() {
       console.error('❌ Sign up error:', error)
       const errorMessage = error.message || 'Failed to create account'
       setError(errorMessage)
-      toast.error(errorMessage)
       return { data: null, error }
     } finally {
       setLoading(false)
@@ -200,7 +208,6 @@ export function useAuth() {
 
       if (data.user) {
         console.log('✅ Sign in successful')
-        toast.success('Signed in successfully!')
         return { data, error: null }
       } else {
         throw new Error('Sign in failed - no user returned')
@@ -209,7 +216,6 @@ export function useAuth() {
       console.error('❌ Sign in error:', error)
       const errorMessage = error.message || 'Failed to sign in'
       setError(errorMessage)
-      toast.error(errorMessage)
       return { data: null, error }
     } finally {
       setLoading(false)
@@ -230,10 +236,8 @@ export function useAuth() {
       setError(null)
       
       console.log('✅ Sign out successful')
-      toast.success('Signed out successfully!')
     } catch (error: any) {
       console.error('❌ Sign out error:', error)
-      toast.error(error.message || 'Failed to sign out')
     } finally {
       setLoading(false)
     }
@@ -253,11 +257,9 @@ export function useAuth() {
       if (error) throw error
       
       setProfile(data)
-      toast.success('Profile updated successfully!')
       return data
     } catch (error: any) {
       console.error('❌ Profile update error:', error)
-      toast.error(error.message || 'Failed to update profile')
       throw error
     }
   }
@@ -303,12 +305,10 @@ const uploadAvatar = async (userId: string, file: File) => {
     setProfile(prev => prev ? { ...prev, avatar_url: publicUrl } : null)
     
     console.log('✅ Avatar uploaded successfully')
-    toast.success('Profile picture updated!')
     
     return publicUrl
   } catch (error: any) {
     console.error('❌ Avatar upload error:', error)
-    toast.error(error.message || 'Failed to upload profile picture')
     throw error
   }
 }

@@ -145,7 +145,10 @@ const goToSlide = (slideIndex: number) => {
                       if (textElement) textElement.style.display = 'block'
                     }}
                   />
-                  <div className="text-xl font-bold text-gray-900 hidden">
+                  <div className="w-14 h-14 bg-blue-600 rounded-xl items-center justify-center hidden">
+                    <span className="text-white font-bold text-2xl">E</span>
+                  </div>
+                  <div className="text-1xl font-bold text-gray-900">
                     Everest <span className="text-gray-600">Global Holdings</span>
                   </div>
                 </Link>

@@ -1,7 +1,8 @@
-// components/auth/SignUpForm.tsx (Fixed Version)
+// components/auth/SignUpForm.tsx (Fixed Version with Styled Popups)
 import { useState, FormEvent } from 'react'
 import { useRouter } from 'next/router'
 import { useAuth } from '../../hooks/useAuth'
+import { useGlobalPopup } from '../ui/PopupProvider'
 
 export function SignUpForm() {
   const [formData, setFormData] = useState({
@@ -16,6 +17,7 @@ export function SignUpForm() {
   
   const { signUp, loading } = useAuth()
   const router = useRouter()
+  const { showSuccess, showError } = useGlobalPopup()
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
@@ -59,12 +61,42 @@ export function SignUpForm() {
       )
 
       if (data?.user && !error) {
-        router.push('/dashboard')
+        // Check if email confirmation is required
+        if (data.user.email_confirmed_at) {
+          // Email already confirmed (shouldn't happen on first signup)
+          showSuccess(
+            'Account Created!',
+            'Your account has been created successfully. Redirecting to dashboard...',
+            2000
+          )
+          setTimeout(() => {
+            router.push('/dashboard')
+          }, 2000)
+        } else {
+          // Email verification required - redirect to verification page
+          showSuccess(
+            'Account Created!',
+            'Please check your email to verify your account before signing in.',
+            3000
+          )
+          localStorage.setItem('pendingVerificationEmail', formData.email)
+          setTimeout(() => {
+            router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`)
+          }, 3000)
+        }
       } else if (error) {
         console.error('❌ Sign up form error:', error)
+        showError(
+          'Sign Up Failed',
+          error.message || 'Failed to create account. Please try again.'
+        )
       }
     } catch (error: unknown) {
       console.error('❌ Sign up form submission error:', error)
+      showError(
+        'Sign Up Error',
+        'An unexpected error occurred. Please try again.'
+      )
     }
   }
 

@@ -6,6 +6,7 @@ import { Clock, Shield, TrendingUp, Users, CheckCircle, Star, Zap } from 'lucide
 import { ChatWidget } from '../components/ChatWidget'
 
 export default function InvestmentPlansPage() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [contactFormOpen, setContactFormOpen] = useState(false)
   const [contactForm, setContactForm] = useState({
     name: '',
@@ -66,14 +67,14 @@ export default function InvestmentPlansPage() {
         {/* Navigation */}
         <nav className="fixed w-full top-0 bg-white/95 backdrop-blur-sm shadow-sm z-50 border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-20">
+            <div className="flex justify-between items-center h-16">
               {/* Logo - Bigger than homepage */}
               <div className="flex items-center">
                 <Link href="/" className="flex items-center gap-3 no-underline">
                   <img 
                     src="/logo.png" 
                     alt="Everest Global Holdings Logo" 
-                    className="h-16 w-auto"
+                    className="h-12 w-auto"
                     onError={(e) => {
                       // First fallback
                       if (e.currentTarget.src !== "/everest-logo.png") {
@@ -89,7 +90,7 @@ export default function InvestmentPlansPage() {
                   <div className="w-14 h-14 bg-blue-600 rounded-xl items-center justify-center hidden">
                     <span className="text-white font-bold text-2xl">E</span>
                   </div>
-                  <div className="text-2xl font-bold text-gray-900">
+                  <div className="text-1xl font-bold text-gray-900">
                     Everest <span className="text-gray-600">Global Holdings</span>
                   </div>
                 </Link>
@@ -100,7 +101,7 @@ export default function InvestmentPlansPage() {
                 <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Home</Link>
                 <Link href="/about" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">About Us</Link>
                 <Link href="/plans" className="text-blue-600 hover:text-blue-700 font-medium transition-colors">Investment Plans</Link>
-                <Link href="#" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Industries</Link>
+                <Link href="/industries" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Industries</Link>
                 <button
                   onClick={() => setContactFormOpen(true)}
                   className="text-gray-700 hover:text-gray-900 font-medium transition-colors bg-transparent border-0 cursor-pointer"
@@ -111,27 +112,70 @@ export default function InvestmentPlansPage() {
               
               {/* CTA Buttons */}
               <div className="flex items-center space-x-4">
-                <Link href="/signin" className="hidden sm:block text-gray-700 hover:text-gray-900 font-medium transition-colors">
+                <div className="hidden md:flex items-center space-x-4">
+                  <Link href="/signin" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">
+                    Sign In
+                  </Link>
+                  <Link href="/signup" className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 font-medium transition-colors">
+                    Get Started
+                  </Link>
+                </div>
+                
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="md:hidden text-gray-700 hover:text-gray-900 bg-transparent border-0 cursor-pointer"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {mobileMenuOpen ? (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    ) : (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    )}
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden bg-white border-t border-gray-200 px-4 py-6">
+              <div className="flex flex-col space-y-4">
+                <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>Home</Link>
+                <Link href="/about" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>About Us</Link>
+                <Link href="/plans" className="text-blue-600 hover:text-blue-700 font-medium" onClick={() => setMobileMenuOpen(false)}>Investment Plans</Link>
+                <Link href="/industries" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>Industries</Link>
+                <button
+                  onClick={() => {
+                    setContactFormOpen(true)
+                    setMobileMenuOpen(false)
+                  }}
+                  className="text-gray-700 hover:text-gray-900 font-medium text-left bg-transparent border-0 cursor-pointer"
+                >
+                  Contact
+                </button>
+                <hr className="border-gray-200" />
+                <Link href="/signin" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>
                   Sign In
                 </Link>
-                <Link href="/signup" className="bg-blue-600 text-white px-6 py-3 rounded-2xl hover:bg-blue-700 font-medium transition-colors">
+                <Link href="/signup" className="bg-blue-600 text-white px-4 py-2 rounded-2xl hover:bg-blue-700 font-medium text-center" onClick={() => setMobileMenuOpen(false)}>
                   Get Started
                 </Link>
               </div>
             </div>
-          </div>
+          )}
         </nav>
 
         {/* Main Content */}
         <main className="pt-20">
           {/* Hero Section */}
-          <section className="py-20 bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 text-white">
+          <section className="py-20 bg-gray-600 text-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center max-w-4xl mx-auto">
                 <h1 className="text-4xl lg:text-6xl font-bold mb-6 leading-tight">
                   Our Investment Plans
                 </h1>
-                <p className="text-xl text-blue-100 mb-8 leading-relaxed">
+                <p className="text-xl text-white-100 mb-8 leading-relaxed">
                   Choose from our carefully structured investment plans designed to maximize your returns with guaranteed daily profits and flexible investment periods.
                 </p>
                 <div className="flex items-center justify-center space-x-8 text-blue-200">
@@ -160,11 +204,11 @@ export default function InvestmentPlansPage() {
                 {/* Compact Plan */}
                 <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-3 border-2 border-gray-200 relative">
                   <div className="text-center mb-8">
-                    <div className="w-20 h-20 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                      <Zap className="w-10 h-10 text-green-600" />
+                    <div className="w-20 h-20 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                      <Zap className="w-10 h-10 text-blue-600" />
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">Compact Plan</h3>
-                    <div className="text-5xl font-bold text-green-600 mb-2">2.5%</div>
+                    <div className="text-5xl font-bold text-blue-600 mb-2">2.5%</div>
                     <div className="text-gray-500 text-lg">Daily Return</div>
                   </div>
                   
@@ -187,7 +231,7 @@ export default function InvestmentPlansPage() {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Total Return:</span>
-                          <span className="font-semibold text-green-600">12.5%</span>
+                          <span className="font-semibold text-blue-600">12.5%</span>
                         </div>
                       </div>
                     </div>
@@ -205,7 +249,7 @@ export default function InvestmentPlansPage() {
                           'Instant withdrawals'
                         ].map((feature, index) => (
                           <li key={index} className="flex items-center">
-                            <CheckCircle className="w-5 h-5 text-green-600 mr-3 flex-shrink-0" />
+                            <CheckCircle className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0" />
                             <span className="text-gray-700">{feature}</span>
                           </li>
                         ))}
@@ -213,7 +257,7 @@ export default function InvestmentPlansPage() {
                     </div>
                   </div>
                   
-                  <Link href="/signup" className="w-full bg-green-600 text-white py-4 rounded-2xl hover:bg-green-700 font-semibold transition-colors text-center block text-lg">
+                  <Link href="/signup" className="w-full bg-blue-600 text-white py-4 rounded-2xl hover:bg-blue-700 font-semibold transition-colors text-center block text-lg">
                     Start Investing
                   </Link>
                 </div>
@@ -287,17 +331,17 @@ export default function InvestmentPlansPage() {
                 {/* Ultimate Plan */}
                 <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-3 border-2 border-gray-200 relative">
                   <div className="text-center mb-8">
-                    <div className="w-20 h-20 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                      <TrendingUp className="w-10 h-10 text-purple-600" />
+                    <div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                      <TrendingUp className="w-10 h-10 text-gray-600" />
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">Ultimate Plan</h3>
-                    <div className="text-5xl font-bold text-purple-600 mb-2">5.0%</div>
+                    <div className="text-5xl font-bold text-gray-700 mb-2">5.0%</div>
                     <div className="text-gray-500 text-lg">Daily Return</div>
                   </div>
                   
                   <div className="space-y-6 mb-8">
                     {/* Investment Details */}
-                    <div className="bg-purple-50 rounded-xl p-6">
+                    <div className="bg-gray-50 rounded-xl p-6">
                       <h4 className="font-semibold text-gray-900 mb-4">Investment Details</h4>
                       <div className="space-y-3">
                         <div className="flex justify-between">
@@ -314,7 +358,7 @@ export default function InvestmentPlansPage() {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Total Return:</span>
-                          <span className="font-semibold text-purple-600">100%</span>
+                          <span className="font-semibold text-gray-700">100%</span>
                         </div>
                       </div>
                     </div>
@@ -334,7 +378,7 @@ export default function InvestmentPlansPage() {
                           'Custom investment strategies'
                         ].map((feature, index) => (
                           <li key={index} className="flex items-center">
-                            <CheckCircle className="w-5 h-5 text-purple-600 mr-3 flex-shrink-0" />
+                            <CheckCircle className="w-5 h-5 text-gray-600 mr-3 flex-shrink-0" />
                             <span className="text-gray-700">{feature}</span>
                           </li>
                         ))}
@@ -342,7 +386,7 @@ export default function InvestmentPlansPage() {
                     </div>
                   </div>
                   
-                  <Link href="/signup" className="w-full bg-purple-600 text-white py-4 rounded-2xl hover:bg-purple-700 font-semibold transition-colors text-center block text-lg">
+                  <Link href="/signup" className="w-full bg-gray-700 text-white py-4 rounded-2xl hover:bg-gray-800 font-semibold transition-colors text-center block text-lg">
                     Start Investing
                   </Link>
                 </div>
@@ -401,11 +445,11 @@ export default function InvestmentPlansPage() {
           </section>
 
           {/* FAQ Section */}
-          <section className="py-20 bg-blue-900 text-white">
+          <section className="py-20 bg-gray-600 text-white">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-12">
                 <h2 className="text-4xl font-bold mb-4">Didn't find your answer?</h2>
-                <p className="text-xl text-blue-200 mb-8">
+                <p className="text-xl text-white-200 mb-8">
                   Our investment experts are here to help you make the right choice
                 </p>
                 <button
@@ -441,10 +485,10 @@ export default function InvestmentPlansPage() {
               }
             }}
           />
-          <div className="w-8 h-8 bg-blue-600 rounded-lg items-center justify-center mr-2 hidden">
+          {/* <div className="w-8 h-8 bg-blue-600 rounded-lg items-center justify-center mr-2 hidden">
             <span className="text-white font-bold">E</span>
           </div>
-          <div className="text-lg font-bold">Everest Global Holdings</div>
+          <div className="text-lg font-bold">Everest Global Holdings</div> */}
         </div>
         <div className="text-sm text-gray-600">
           20-22 Wenlock Road, London, N1 7GU England

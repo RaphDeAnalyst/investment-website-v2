@@ -110,14 +110,14 @@ export default function SignInPage() {
               <p className="text-xs text-slate-500">
                 By signing in, you agree to our{' '}
                 <a 
-                  href="#" 
+                  href="/terms" 
                   className="text-slate-800 hover:text-slate-600 transition-colors"
                 >
                   Terms of Service
                 </a>{' '}
                 and{' '}
                 <a 
-                  href="#" 
+                  href="/privacy" 
                   className="text-slate-800 hover:text-slate-600 transition-colors"
                 >
                   Privacy Policy

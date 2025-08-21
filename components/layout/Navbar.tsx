@@ -1,14 +1,34 @@
 // components/layout/Navbar.tsx
 import { Fragment, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
+import { useGlobalPopup } from '../ui/PopupProvider'
 
 export function Navbar() {
   const { user, profile, signOut } = useAuth()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { showSuccess, showError, showConfirm } = useGlobalPopup()
 
   const handleSignOut = () => {
-    signOut()
-    setIsMenuOpen(false)
+    showConfirm(
+      'Confirm Logout',
+      'Are you sure you want to logout?',
+      async () => {
+        try {
+          await signOut()
+          showSuccess(
+            'Logged Out',
+            'You have been successfully logged out.',
+            2000
+          )
+          setIsMenuOpen(false)
+        } catch (error) {
+          showError(
+            'Logout Failed',
+            'Failed to logout. Please try again.'
+          )
+        }
+      }
+    )
   }
 
   return (

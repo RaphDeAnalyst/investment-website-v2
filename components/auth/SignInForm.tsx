@@ -1,7 +1,9 @@
-// components/auth/SignInForm.tsx (Updated with Password Visibility)
+// components/auth/SignInForm.tsx (Updated with Password Visibility & Styled Popups)
 import { useState, FormEvent } from 'react'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
 import { useAuth } from '../../hooks/useAuth'
+import { useGlobalPopup } from '../ui/PopupProvider'
 
 export function SignInForm() {
   const [formData, setFormData] = useState({
@@ -13,6 +15,7 @@ export function SignInForm() {
   
   const { signIn, loading } = useAuth()
   const router = useRouter()
+  const { showSuccess, showError } = useGlobalPopup()
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
@@ -40,12 +43,27 @@ export function SignInForm() {
       const { data, error } = await signIn(formData.email, formData.password)
 
       if (data?.user && !error) {
-        router.push('/dashboard')
+        showSuccess(
+          'Welcome Back!', 
+          'You have successfully signed in. Redirecting to your dashboard...',
+          2000
+        )
+        setTimeout(() => {
+          router.push('/dashboard')
+        }, 2000)
       } else if (error) {
         console.error('❌ Sign in form error:', error)
+        showError(
+          'Sign In Failed',
+          error.message || 'Invalid email or password. Please try again.'
+        )
       }
     } catch (error: unknown) {
       console.error('❌ Sign in form submission error:', error)
+      showError(
+        'Sign In Error',
+        'An unexpected error occurred. Please try again.'
+      )
     }
   }
 
@@ -192,6 +210,21 @@ export function SignInForm() {
         )}
         Sign In
       </button>
+
+      {/* Forgot Password Link */}
+      <div style={{ textAlign: 'center', marginTop: '16px' }}>
+        <Link
+          href="/forgot-password"
+          style={{
+            color: '#2563eb',
+            fontSize: '14px',
+            textDecoration: 'none',
+            fontWeight: '500'
+          }}
+        >
+          Forgot your password?
+        </Link>
+      </div>
 
       <style jsx>{`
         @keyframes spin {
