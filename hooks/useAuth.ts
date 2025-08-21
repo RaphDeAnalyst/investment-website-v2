@@ -38,13 +38,21 @@ export function useAuth() {
       try {
         console.log('🔄 Initializing auth...')
         
-        // Get initial session
+        // Get initial session with better error handling
         const { data: { session }, error: sessionError } = await supabase.auth.getSession()
         
         if (sessionError) {
-          console.error('❌ Session error:', sessionError)
-          setError(sessionError.message)
-          return
+          // Only treat as error if it's not just "no session"
+          if (sessionError.message !== 'Auth session missing!' && 
+              !sessionError.message.includes('session missing') &&
+              !sessionError.message.includes('no session')) {
+            console.error('❌ Session error:', sessionError)
+            setError(sessionError.message)
+            return
+          } else {
+            // No session is normal for public pages
+            console.log('ℹ️ No active session (normal for public pages)')
+          }
         }
 
         if (mounted) {
@@ -54,8 +62,18 @@ export function useAuth() {
         
       } catch (err: any) {
         console.error('❌ Auth initialization error:', err)
-        if (mounted) {
+        // Check for various session error patterns
+        const isSessionError = err.message.includes('session missing') || 
+                              err.message.includes('Auth session missing') ||
+                              err.message.includes('AuthSessionMissingError') ||
+                              err.name === 'AuthSessionMissingError'
+        
+        if (mounted && !isSessionError) {
           setError(err.message)
+        } else if (isSessionError) {
+          console.log('ℹ️ Session error handled gracefully (normal for public pages)')
+          // Set user to null for public pages
+          setUser(null)
         }
       } finally {
         if (mounted) {

@@ -30,12 +30,45 @@ export function ChatWidget() {
   // Check if user is logged in when component mounts
   useEffect(() => {
     const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user?.email) {
-        setIsLoggedIn(true)
-        setUserEmail(user.email)
-        setNeedsEmail(false)
-      } else {
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser()
+        if (error) {
+          // Check if it's just a session missing error (normal for public pages)
+          const isSessionError = error.message.includes('session missing') || 
+                                error.message.includes('Auth session missing') ||
+                                error.message.includes('AuthSessionMissingError') ||
+                                error.name === 'AuthSessionMissingError'
+          
+          if (isSessionError) {
+            console.log('ℹ️ No session in ChatWidget (normal for public pages)')
+          } else {
+            console.error('❌ Auth check error:', error)
+          }
+          setIsLoggedIn(false)
+          setNeedsEmail(true)
+          return
+        }
+        if (user?.email) {
+          setIsLoggedIn(true)
+          setUserEmail(user.email)
+          setNeedsEmail(false)
+        } else {
+          setIsLoggedIn(false)
+          setNeedsEmail(true)
+        }
+      } catch (error: unknown) {
+        // Handle session errors gracefully
+        const err = error as Error
+        const isSessionError = err.message?.includes('session missing') || 
+                              err.message?.includes('Auth session missing') ||
+                              err.message?.includes('AuthSessionMissingError') ||
+                              err.name === 'AuthSessionMissingError'
+        
+        if (isSessionError) {
+          console.log('ℹ️ Session error in ChatWidget handled gracefully')
+        } else {
+          console.error('❌ User check error:', error)
+        }
         setIsLoggedIn(false)
         setNeedsEmail(true)
       }
@@ -91,7 +124,11 @@ export function ChatWidget() {
         })
       })
 
-      if (!response.ok) throw new Error('Failed to send message')
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        console.error('❌ API response error:', response.status, errorData)
+        throw new Error(errorData.error || `HTTP ${response.status}: Failed to send message`)
+      }
 
       // Add confirmation message
       const confirmMessage: ChatMessage = {
@@ -106,9 +143,10 @@ export function ChatWidget() {
       setNeedsEmail(false)
       toast.success('Message sent successfully!')
 
-    } catch (error) {
-      console.error('Error sending message:', error)
-      toast.error('Failed to send message. Please try again.')
+    } catch (error: unknown) {
+      console.error('❌ Chat message send error:', error)
+      const errorMessage = (error as Error)?.message || 'Failed to send message. Please try again.'
+      toast.error(errorMessage)
     } finally {
       setSending(false)
     }

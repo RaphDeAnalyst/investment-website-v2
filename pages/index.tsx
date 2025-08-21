@@ -1,4 +1,4 @@
-// pages/index.tsx - Complete Mobile-Responsive Homepage
+// pages/index.tsx - Complete Restructured Homepage with Monochromatic Design
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
@@ -10,6 +10,42 @@ export default function HomePage() {
   const { user, loading } = useAuth()
   const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [testimonialIndex, setTestimonialIndex] = useState(0)
+  const [contactFormOpen, setContactFormOpen] = useState(false)
+  const [investmentCalculator, setInvestmentCalculator] = useState({
+    amount: 10000,
+    plan: 'compact',
+    expectedReturn: 11250
+  })
+  const [contactForm, setContactForm] = useState({
+    name: '',
+    email: '',
+    message: ''
+  })
+
+  // Hero carousel state and data
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const totalSlides = 3
+
+  const heroImages = [
+  'hero/hero-background1.jpg',
+  'hero/hero-background2.jpg',
+  'hero/hero-background3.jpg'
+]
+
+  // Auto-rotate hero carousel
+useEffect(() => {
+  const interval = setInterval(() => {
+    setCurrentSlide((prev) => (prev + 1) % totalSlides)
+  }, 5000)
+  return () => clearInterval(interval)
+}, [])
+
+const goToSlide = (slideIndex: number) => {
+  setCurrentSlide(slideIndex)
+}
+
+  // Industry image error states
   const [industryImageErrors, setIndustryImageErrors] = useState({
     oil: false,
     realestate: false,
@@ -18,14 +54,8 @@ export default function HomePage() {
     agro: false,
     gold: false
   })
-  const [testimonialIndex, setTestimonialIndex] = useState(0)
-  const [contactFormOpen, setContactFormOpen] = useState(false)
-  const [contactForm, setContactForm] = useState({
-    name: '',
-    email: '',
-    message: ''
-  })
 
+  // Auto-rotate testimonials
   useEffect(() => {
     const interval = setInterval(() => {
       setTestimonialIndex((prevIndex) => (prevIndex + 1) % 3)
@@ -33,17 +63,44 @@ export default function HomePage() {
     return () => clearInterval(interval)
   }, [])
 
-  const handleContactSubmit = async (e: React.FormEvent) => {
+   
+   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     try {
-      console.log('Contact form submitted:', contactForm)
+      console.log('📨 Submitting contact form:', {
+        name: contactForm.name,
+        email: contactForm.email,
+        messageLength: contactForm.message.length
+      })
+
+      const response = await fetch('/api/send-message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userEmail: contactForm.email,
+          message: `Name: ${contactForm.name}\n\nMessage: ${contactForm.message}`,
+          timestamp: new Date().toISOString()
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        console.error('❌ Contact form API error:', response.status, errorData)
+        throw new Error(errorData.error || `HTTP ${response.status}: Failed to send message`)
+      }
+
+      const result = await response.json()
+      console.log('✅ Contact form sent successfully:', result)
+      
       setContactForm({ name: '', email: '', message: '' })
       setContactFormOpen(false)
-      alert('Thank you for your message! We will get back to you soon.')
-    } catch (error) {
-      console.error('Error sending message:', error)
-      alert('Sorry, there was an error sending your message. Please try again.')
+      alert('Thank you for your message! We have received it and will get back to you soon.')
+      
+    } catch (error: unknown) {
+      console.error('❌ Contact form submission error:', error)
+      const errorMessage = (error as Error)?.message || 'Sorry, there was an error sending your message. Please try again.'
+      alert(errorMessage)
     }
   }
 
@@ -56,8 +113,8 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-blue-50">
-        <div className="w-8 h-8 border-3 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="w-8 h-8 border-3 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
       </div>
     )
   }
@@ -66,127 +123,151 @@ export default function HomePage() {
     <>
       <Head>
         <title>Everest Global Holdings - Professional Investment Platform</title>
-        <meta name="description" content="Your gateway to professional investment management with guaranteed returns" />
+        <meta name="description" content="Professional investment management with guaranteed returns across diverse markets" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
-        {/* Header */}
-        <header className="nav-main sticky top-0 z-50">
-          <div className="nav-container">
-            {/* Logo */}
-            <div className="flex items-center">
-              <Link href="/" className="flex items-center gap-2 no-underline">
-                <img 
-                  src="/logo.png" 
-                  alt="Everest Global Holdings Logo" 
-                  className="h-12 sm:h-16 lg:h-20 w-auto"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    const textElement = e.currentTarget.nextElementSibling as HTMLElement;
-                    if (textElement) textElement.style.display = 'block';
-                  }}
-                />
-                <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 m-0 hidden">
-                  Investment<span className="text-blue-600">Pro</span>
-                </h1>
-              </Link>
-            </div>
-
-            {/* Desktop Navigation */}
-            <nav className="nav-links">
-              <Link href="/" className="nav-link">Home</Link>
-              <Link href="/about" className="nav-link">About</Link>
-              <Link href="/plans" className="nav-link">Plans</Link>
-              <Link href="/industries" className="nav-link">Industries</Link>
-              <button
-                onClick={() => setContactFormOpen(true)}
-                className="nav-link bg-transparent border-0 cursor-pointer"
-              >
-                Contact
-              </button>
-            </nav>
-
-            {/* Auth Buttons + Mobile Menu Button */}
-            <div className="flex items-center gap-4">
-              {/* Desktop Auth Buttons */}
-              <div className="hidden md:flex items-center gap-4">
-                <Link href="/signin" className="text-gray-500 no-underline font-medium text-sm hover:text-blue-600 transition-colors">
-                  Sign In
-                </Link>
-                <Link href="/signup" className="bg-gray-700 text-white px-4 py-2 rounded-md no-underline font-medium text-sm hover:bg-gray-800 transition-colors">
-                  Get Started
+      <div className="page-wrapper">
+        {/* Navigation */}
+        <nav className="fixed w-full top-0 bg-white/95 backdrop-blur-sm shadow-sm z-50 border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-16">
+              <div className="flex items-center">
+                <Link href="/" className="flex items-center gap-2 no-underline">
+                  <img 
+                    src="/logo.png" 
+                    alt="Everest Global Holdings Logo" 
+                    className="h-12 w-auto"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none'
+                      const textElement = e.currentTarget.nextElementSibling as HTMLElement
+                      if (textElement) textElement.style.display = 'block'
+                    }}
+                  />
+                  <div className="text-xl font-bold text-gray-900 hidden">
+                    Everest <span className="text-gray-600">Global Holdings</span>
+                  </div>
                 </Link>
               </div>
-
-              {/* Mobile Menu Button */}
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden bg-transparent border-0 cursor-pointer p-2 text-gray-700 hover:text-gray-900"
-              >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  {mobileMenuOpen ? (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  ) : (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  )}
-                </svg>
-              </button>
+              
+              <div className="hidden md:flex items-center space-x-8">
+                <a href="#home" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Home</a>
+                <a href="#about" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">About</a>
+                <a href="#plans" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Plans</a>
+                <a href="#expertise" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Expertise</a>
+                <button
+                  onClick={() => setContactFormOpen(true)}
+                  className="text-gray-700 hover:text-gray-900 font-medium transition-colors bg-transparent border-0 cursor-pointer"
+                >
+                  Contact
+                </button>
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                <div className="hidden md:flex items-center space-x-4">
+                  <Link href="/signin" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">
+                    Sign In
+                  </Link>
+                  <Link href="/signup" className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 font-medium transition-colors">
+                    Get Started
+                  </Link>
+                </div>
+                
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="md:hidden text-gray-700 hover:text-gray-900 bg-transparent border-0 cursor-pointer"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {mobileMenuOpen ? (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    ) : (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    )}
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Mobile Navigation Menu */}
+          {/* Mobile Menu */}
           {mobileMenuOpen && (
-            <div className="mobile-menu">
-              <div className="flex flex-col gap-3">
-                <Link href="/" className="mobile-menu-item">Home</Link>
-                <Link href="/about" className="mobile-menu-item">About</Link>
-                <Link href="/plans" className="mobile-menu-item">Plans</Link>
-                <Link href="/industries" className="mobile-menu-item">Industries</Link>
+            <div className="md:hidden bg-white border-t border-gray-200 px-4 py-6">
+              <div className="flex flex-col space-y-4">
+                <a href="#home" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>Home</a>
+                <a href="#about" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>About</a>
+                <a href="#plans" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>Plans</a>
+                <a href="#expertise" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>Expertise</a>
                 <button
                   onClick={() => {
                     setContactFormOpen(true)
                     setMobileMenuOpen(false)
                   }}
-                  className="mobile-menu-item bg-transparent border-0 cursor-pointer text-left w-full p-0"
+                  className="text-gray-700 hover:text-gray-900 font-medium text-left bg-transparent border-0 cursor-pointer"
                 >
                   Contact
                 </button>
-                <hr className="my-3 border-gray-200" />
-                <Link href="/signin" className="mobile-menu-item">Sign In</Link>
-                <Link href="/signup" className="bg-gray-700 text-white px-4 py-3 rounded-md no-underline font-medium text-sm text-center block hover:bg-gray-800 transition-colors">
+                <hr className="border-gray-200" />
+                <Link href="/signin" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>
+                  Sign In
+                </Link>
+                <Link href="/signup" className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 font-medium text-center" onClick={() => setMobileMenuOpen(false)}>
                   Get Started
                 </Link>
               </div>
             </div>
           )}
-        </header>
+        </nav>
 
-        {/* Hero Section */}
-        <section className="hero-section">
-          <div className="hero-grid">
-            <div className="hero-content">
-              <div className="welcome-icon lg:mx-0">
-                <div className="text-2xl sm:text-3xl">📈</div>
+        {/* Hero Carousel Section JSX: */}
+        {/* Hero Carousel Section */}
+        <section id="home" className="relative h-screen overflow-hidden">
+          {/* Carousel Container */}
+          <div className="relative w-full h-full">
+            {heroImages.map((image, index) => (
+              <div
+                key={index}
+                className={`absolute inset-0 w-full h-full transition-transform duration-500 ease-in-out ${
+                  index === currentSlide ? 'translate-x-0' : 
+                  index < currentSlide ? '-translate-x-full' : 'translate-x-full'
+                }`}
+              >
+                <img src={image} alt={`Hero ${index + 1}`} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-r from-gray-600/80 via-blue-600/60 to-gray-900/80"></div>
               </div>
-              
-              <h1 className="welcome-title">
-                Secure Investments.<br />
-                <span className="text-slate-400">Trusted Growth.</span>
-              </h1>
-              
-              <p className="welcome-subtitle">
-                Join thousands of investors who trust us for their financial growth.
-              </p>
-              
-              <Link href="/signup" className="btn-primary inline-flex items-center gap-2 text-lg px-8 py-4 hover:bg-blue-700 transition-colors">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-                Get Started
-              </Link>
+            ))}
+          </div>
+
+          {/* Hero Content Overlay - Left Justified */}
+          <div className="absolute inset-0 flex items-center">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+              <div className="max-w-2xl">
+                <h1 className="text-4xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+                  Professional Investment Management
+                </h1>
+                <p className="text-xl text-gray-200 mb-8 leading-relaxed">
+                  Partner with Everest Global Holdings for strategic investment solutions that deliver consistent returns across diverse market conditions.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link href="/signup" className="bg-blue-600 text-white px-8 py-4 rounded-2xl font-semibold hover:bg-blue-700 transition-colors text-center">
+                    Start Investing
+                  </Link>
+                </div>
+              </div>
             </div>
+          </div>
+
+          {/* Carousel Indicators */}
+          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3">
+            {heroImages.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => goToSlide(index)}
+                className={`w-3 h-3 rounded-full transition-opacity ${
+                  index === currentSlide ? 'bg-white opacity-100' : 'bg-white opacity-50'
+                }`}
+              />
+            ))}
           </div>
         </section>
 
@@ -196,11 +277,11 @@ export default function HomePage() {
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-800 mb-4">
               WHY CHOOSE US?
             </h2>
-            <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
+            <p className="text-lg sm:text-xl text-slate-600 max-w-3xl mx-auto">
               We provide secure, transparent, and profitable investment opportunities designed for modern investors.
             </p>
           </div>
-
+          
           {/* Feature Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             <div className="card-base p-6 sm:p-8 text-center">
@@ -247,706 +328,628 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Investment Plans Section */}
-        <section className="section-padding container-responsive bg-gray-50 border-b border-gray-200">
-          <div className="text-center mb-16">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-800 mb-4">
-              CHOOSE YOUR PLANS
-            </h2>
-            <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
-              Select the investment plan that matches your financial goals and risk tolerance.
-            </p>
-          </div>
-
-          {/* Plan Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
-            {/* Compact Plan */}
-            <div className="plan-card">
-              <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-6">
-                <svg className="w-8 h-8 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
-              </div>
-              
-              <h3 className="plan-title">Compact Plan</h3>
-              
-              <div className="text-sm text-slate-600 mb-6 leading-relaxed space-y-2">
-                <div>• 5 days duration</div>
-                <div>• 2.5% return rate</div>
-                <div>• Quick turnaround</div>
-                <div>• Perfect for beginners</div>
-              </div>
-              
-              <div className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">
-                $200 - $20K
-              </div>
-              
-              <Link href="/signup" className="btn-primary w-full text-center inline-flex items-center justify-center hover:bg-blue-700 transition-colors">
-                Get Started
-              </Link>
-            </div>
-
-            {/* Master Plan - Highlighted */}
-            <div className="plan-card border-slate-800 bg-blue-50 relative transform scale-105 shadow-xl">
-              {/* Popular Badge */}
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white px-6 py-2 rounded-full text-xs font-semibold uppercase tracking-wide">
-                Most Popular
-              </div>
-              
-              <div className="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mx-auto mb-6">
-                <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                </svg>
-              </div>
-              
-              <h3 className="plan-title">Master Plan</h3>
-              
-              <div className="text-sm text-slate-600 mb-6 leading-relaxed space-y-2">
-                <div>• 10 days duration</div>
-                <div>• 3.5% return rate</div>
-                <div>• Balanced approach</div>
-                <div>• Recommended choice</div>
-              </div>
-              
-              <div className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">
-                $20K - $100K
-              </div>
-              
-              <Link href="/signup" className="btn-primary w-full text-center inline-flex items-center justify-center shadow-lg hover:bg-blue-700 transition-colors">
-                Get Started
-              </Link>
-            </div>
-
-            {/* Ultimate Plan */}
-            <div className="plan-card">
-              <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-6">
-                <svg className="w-8 h-8 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                </svg>
-              </div>
-              
-              <h3 className="plan-title">Ultimate Plan</h3>
-              
-              <div className="text-sm text-slate-600 mb-6 leading-relaxed space-y-2">
-                <div>• 20 days duration</div>
-                <div>• 5.0% return rate</div>
-                <div>• Maximum returns</div>
-                <div>• For serious investors</div>
-              </div>
-              
-              <div className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">
-                $100K+
-              </div>
-              
-              <Link href="/signup" className="btn-primary w-full text-center inline-flex items-center justify-center hover:bg-blue-700 transition-colors">
-                Get Started
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* Industries Section */}
-        <section className="section-padding container-responsive border-b border-gray-200">
-          <div className="text-center mb-16">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-800 mb-4">
-              INDUSTRIES
-            </h2>
-            <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
-              We invest across diverse industries to maximize returns and minimize risk through strategic portfolio diversification.
-            </p>
-          </div>
-
-          {/* Industries Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
-            {/* Oil & Gas */}
-            <div className="card-base p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-full h-45 bg-gray-50 rounded-lg flex items-center justify-center mb-5 overflow-hidden">
-                {!industryImageErrors.oil ? (
-                  <img 
-                    src="/industries/oil-gas.jpg" 
-                    alt="Oil & Gas Industry" 
-                    className="w-full h-full object-cover rounded-lg"
-                    onError={() => setIndustryImageErrors(prev => ({ ...prev, oil: true }))}
-                  />
-                ) : (
-                  <span className="text-slate-500 text-sm">Oil & Gas Industry</span>
-                )}
-              </div>
-              
-              <h3 className="text-lg font-semibold text-slate-800 mb-3">Oil & Gas</h3>
-              
-              <p className="text-sm text-slate-600 mb-5 leading-relaxed">
-                Strategic investments in energy sector companies and exploration projects with stable long-term returns.
+        {/* About Section */}
+      <section id="about" className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <h2 className="text-4xl font-bold text-gray-900 mb-6">
+                Solution-Oriented Investment Partnerships
+              </h2>
+              <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+                At Everest Global Holdings, we focus on building long-term partnerships with anyone; beginner investors, sophisticated investors, institutions, and high-net-worth individuals. Our approach combines rigorous analysis with innovative strategies to achieve sustainable growth.
               </p>
               
-              <Link href="/industries" className="btn-secondary text-xs px-4 py-2 hover:bg-gray-100 transition-colors">
-                Read More
-              </Link>
-            </div>
-
-            {/* Real Estate */}
-            <div className="card-base p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-full h-45 bg-gray-50 rounded-lg flex items-center justify-center mb-5 overflow-hidden">
-                {!industryImageErrors.realestate ? (
-                  <img 
-                    src="/industries/real-estate.jpg" 
-                    alt="Real Estate Industry" 
-                    className="w-full h-full object-cover rounded-lg"
-                    onError={() => setIndustryImageErrors(prev => ({ ...prev, realestate: true }))}
-                  />
-                ) : (
-                  <span className="text-slate-500 text-sm">Real Estate Industry</span>
-                )}
+              <div className="grid md:grid-cols-2 gap-8 mb-8">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3">Partnership Focus</h3>
+                  <p className="text-gray-600 text-sm">We focus on long-term partnerships with talented and motivated entrepreneurs, managers, colleagues and investors to achieve common goals.</p>
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3">Creative Solutions</h3>
+                  <p className="text-gray-600 text-sm">Our thoughtful and flexible approach allows us to develop creative solutions that meet the needs of business owners and management teams.</p>
+                </div>
               </div>
               
-              <h3 className="text-lg font-semibold text-slate-800 mb-3">Real Estate</h3>
-              
-              <p className="text-sm text-slate-600 mb-5 leading-relaxed">
-                Premium property investments and development projects in high-growth markets worldwide.
-              </p>
-              
-              <Link href="/industries" className="btn-secondary text-xs px-4 py-2 hover:bg-gray-100 transition-colors">
-                Read More
+              <Link href="/about" className="bg-gray-900 text-white px-8 py-3 rounded-lg hover:bg-gray-800 font-medium transition-colors inline-block">
+                Learn More About Our Approach
               </Link>
-            </div>
-
-            {/* Stocks */}
-            <div className="card-base p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-full h-45 bg-gray-50 rounded-lg flex items-center justify-center mb-5 overflow-hidden">
-                {!industryImageErrors.stocks ? (
-                  <img 
-                    src="/industries/stocks.jpg" 
-                    alt="Stocks & Trading" 
-                    className="w-full h-full object-cover rounded-lg"
-                    onError={() => setIndustryImageErrors(prev => ({ ...prev, stocks: true }))}
-                  />
-                ) : (
-                  <span className="text-slate-500 text-sm">Stocks & Trading</span>
-                )}
-              </div>
-              
-              <h3 className="text-lg font-semibold text-slate-800 mb-3">Stocks</h3>
-              
-              <p className="text-sm text-slate-600 mb-5 leading-relaxed">
-                Diversified equity portfolios focused on blue-chip companies and emerging market opportunities.
-              </p>
-              
-              <Link href="/industries" className="btn-secondary text-xs px-4 py-2 hover:bg-gray-100 transition-colors">
-                Read More
-              </Link>
-            </div>
-
-            {/* AI Arbitrage */}
-            <div className="card-base p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-full h-45 bg-gray-50 rounded-lg flex items-center justify-center mb-5 overflow-hidden">
-                {!industryImageErrors.ai ? (
-                  <img 
-                    src="/industries/ai-arbitrage.jpg" 
-                    alt="AI Arbitrage Technology" 
-                    className="w-full h-full object-cover rounded-lg"
-                    onError={() => setIndustryImageErrors(prev => ({ ...prev, ai: true }))}
-                  />
-                ) : (
-                  <span className="text-slate-500 text-sm">AI Arbitrage Technology</span>
-                )}
-              </div>
-              
-              <h3 className="text-lg font-semibold text-slate-800 mb-3">AI Arbitrage</h3>
-              
-              <p className="text-sm text-slate-600 mb-5 leading-relaxed">
-                Advanced algorithmic trading strategies leveraging artificial intelligence for market inefficiencies.
-              </p>
-              
-              <Link href="/industries" className="btn-secondary text-xs px-4 py-2 hover:bg-gray-100 transition-colors">
-                Read More
-              </Link>
-            </div>
-
-            {/* Agro Farming */}
-            <div className="card-base p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-full h-45 bg-gray-50 rounded-lg flex items-center justify-center mb-5 overflow-hidden">
-                {!industryImageErrors.agro ? (
-                  <img 
-                    src="/industries/agro-farming.jpg" 
-                    alt="Agriculture & Farming" 
-                    className="w-full h-full object-cover rounded-lg"
-                    onError={() => setIndustryImageErrors(prev => ({ ...prev, agro: true }))}
-                  />
-                ) : (
-                  <span className="text-slate-500 text-sm">Agriculture & Farming</span>
-                )}
-              </div>
-              
-              <h3 className="text-lg font-semibold text-slate-800 mb-3">Agro Farming</h3>
-              
-              <p className="text-sm text-slate-600 mb-5 leading-relaxed">
-                Sustainable agriculture investments and modern farming technologies for food security.
-              </p>
-              
-              <Link href="/industries" className="btn-secondary text-xs px-4 py-2 hover:bg-gray-100 transition-colors">
-                Read More
-              </Link>
-            </div>
-
-            {/* Gold Mining */}
-            <div className="card-base p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-full h-45 bg-gray-50 rounded-lg flex items-center justify-center mb-5 overflow-hidden">
-                {!industryImageErrors.gold ? (
-                  <img 
-                    src="/industries/gold-mining.jpg" 
-                    alt="Gold Mining Operations" 
-                    className="w-full h-full object-cover rounded-lg"
-                    onError={() => setIndustryImageErrors(prev => ({ ...prev, gold: true }))}
-                  />
-                ) : (
-                  <span className="text-slate-500 text-sm">Gold Mining Operations</span>
-                )}
-              </div>
-              
-              <h3 className="text-lg font-semibold text-slate-800 mb-3">Gold Mining</h3>
-              
-              <p className="text-sm text-slate-600 mb-5 leading-relaxed">
-                Precious metals extraction and trading operations for portfolio stability and inflation hedging.
-              </p>
-              
-              <Link href="/industries" className="btn-secondary text-xs px-4 py-2 hover:bg-gray-100 transition-colors">
-                Read More
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* About Us Section */}
-        <section className="section-padding container-responsive bg-gray-50 border-b border-gray-200">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-20 items-center">
-            {/* Left Side - Image */}
-            <div className="w-full h-64 sm:h-96 lg:h-[500px] rounded-lg overflow-hidden relative order-2 lg:order-1">
-              <div 
-                className="w-full h-full bg-cover bg-center bg-no-repeat"
-                style={{ backgroundImage: 'url(/about-us-image.jpg)' }}
-              />
-              {/* Fallback for missing image */}
-              <div className="absolute inset-0 bg-slate-100 flex items-center justify-center text-slate-500 text-sm font-medium -z-10">
-                Professional Investment Team
-              </div>
             </div>
             
-            {/* Right Side - Content */}
-            <div className="order-1 lg:order-2">
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-800 mb-4 leading-tight">
-                About Us
-              </h2>
-              
-              <h3 className="text-lg sm:text-xl font-semibold text-slate-600 mb-6 leading-relaxed">
-                Building Wealth with Trust and Transparency
-              </h3>
-              
-              <p className="text-sm sm:text-base text-slate-600 mb-8 leading-relaxed">
-                At Everest Global Holdings, we are committed to empowering individuals and institutions to achieve their financial goals through strategic, secure, and transparent investment solutions. With over a decade of experience in the financial markets, our team of expert analysts and portfolio managers combines cutting-edge technology with proven investment strategies to deliver consistent, long-term growth.
+            {/* Professional Team Image */}
+            <div className="order-first lg:order-last">
+              <img 
+                src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
+                alt="Professional Investment Team at Everest Global Holdings" 
+                className="w-full h-96 object-cover rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300"
+                onError={(e) => {
+                  // First fallback
+                  if (e.currentTarget.src !== "https://images.unsplash.com/photo-1556761175-b413da4baf72?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80") {
+                    e.currentTarget.src = "https://images.unsplash.com/photo-1556761175-b413da4baf72?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                  } else {
+                    // Final fallback to local image
+                    e.currentTarget.src = "/about-us-image.jpg"
+                  }}}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+        {/* Investment Plans */}
+        <section id="plans" className="py-20 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">Investment Plans</h2>
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                Choose from our carefully structured investment plans designed to match your financial objectives and risk profile.
               </p>
-              
-              <p className="text-sm sm:text-base text-slate-600 mb-8 leading-relaxed">
-                We believe that everyone deserves access to professional-grade investment opportunities. Our platform is built on the foundations of trust, transparency, and unwavering commitment to our clients' success.
-              </p>
-              
-              <Link href="/about" className="btn-primary inline-flex items-center gap-2 hover:bg-blue-700 transition-colors">
-                Learn More
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
+            </div>
+            
+            <div className="grid md:grid-cols-3 gap-8">
+              {/* Compact Plan */}
+              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all hover:-translate-y-2 border border-gray-200">
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900">Compact Plan</h3>
+                  <div className="text-3xl font-bold text-gray-800 mt-2">2.5%</div>
+                  <div className="text-gray-500">per day for 5 days</div>
+                </div>
+                
+                <ul className="space-y-3 mb-8 text-gray-600">
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-gray-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                    </svg>
+                    Minimum $200 investment
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-gray-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                    </svg>
+                    Maximum $20,000
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-gray-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                    </svg>
+                    Perfect for beginners
+                  </li>
+                </ul>
+                
+                <Link href="/signup" className="w-full bg-gray-900 text-white py-3 rounded-lg hover:bg-gray-800 font-medium transition-colors text-center block">
+                  Get Started
+                </Link>
+              </div>
+
+              {/* Master Plan */}
+              <div className="bg-white rounded-2xl p-8 shadow-2xl border-2 border-gray-900 relative hover:shadow-xl transition-all hover:-translate-y-2">
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-2 rounded-full text-sm font-medium">
+                  Most Popular
+                </div>
+                
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-gray-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900">Master Plan</h3>
+                  <div className="text-3xl font-bold text-gray-800 mt-2">3.5%</div>
+                  <div className="text-gray-500">per day for 10 days</div>
+                </div>
+                
+                <ul className="space-y-3 mb-8 text-gray-600">
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-gray-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                    </svg>
+                    Minimum $20,000 investment
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-gray-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                    </svg>
+                    Maximum $100,000
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-gray-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                    </svg>
+                    Recommended choice
+                  </li>
+                </ul>
+                
+                <Link href="/signup" className="w-full bg-gray-900 text-white py-3 rounded-lg hover:bg-gray-800 font-medium transition-colors text-center block">
+                  Get Started
+                </Link>
+              </div>
+
+              {/* Ultimate Plan */}
+              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all hover:-translate-y-2 border border-gray-200">
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900">Ultimate Plan</h3>
+                  <div className="text-3xl font-bold text-gray-800 mt-2">5.0%</div>
+                  <div className="text-gray-500">per day for 20 days</div>
+                </div>
+                
+                <ul className="space-y-3 mb-8 text-gray-600">
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-gray-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                    </svg>
+                    Minimum $100,000+
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-gray-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                    </svg>
+                    No maximum limit
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-gray-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                    </svg>
+                    For serious investors
+                  </li>
+                </ul>
+                
+                <Link href="/signup" className="w-full bg-gray-900 text-white py-3 rounded-lg hover:bg-gray-800 font-medium transition-colors text-center block">
+                  Get Started
+                </Link>
+              </div>
             </div>
           </div>
         </section>
 
+        {/* Expertise & Industries */}
+        <section id="expertise" className="py-20 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Investment Expertise</h2>
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                Diversified portfolio management across high-growth sectors with proven track records.
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {/* Oil & Gas */}
+              <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-2 border border-gray-200">
+                <div className="w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center mb-5 overflow-hidden">
+                  {!industryImageErrors.oil ? (
+                    <img 
+                      src="/industries/oil-gas.jpg" 
+                      alt="Oil & Gas Industry" 
+                      className="w-full h-full object-cover rounded-lg"
+                      onError={() => setIndustryImageErrors(prev => ({ ...prev, oil: true }))}
+                    />
+                  ) : (
+                    <span className="text-gray-500 text-sm">Oil & Gas Industry</span>
+                  )}
+                </div>
+                
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Oil & Gas</h3>
+                
+                <p className="text-sm text-gray-600 mb-5 leading-relaxed">
+                  Strategic investments in energy sector companies and exploration projects with stable long-term returns.
+                </p>
+                
+                <Link href="/industries" className="text-gray-700 hover:text-gray-900 text-xs px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors inline-block">
+                  Read More
+                </Link>
+              </div>
+
+              {/* Real Estate */}
+              <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-2 border border-gray-200">
+                <div className="w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center mb-5 overflow-hidden">
+                  {!industryImageErrors.realestate ? (
+                    <img 
+                      src="/industries/real-estate.jpg" 
+                      alt="Real Estate Industry" 
+                      className="w-full h-full object-cover rounded-lg"
+                      onError={() => setIndustryImageErrors(prev => ({ ...prev, realestate: true }))}
+                    />
+                  ) : (
+                    <span className="text-gray-500 text-sm">Real Estate Industry</span>
+                  )}
+                </div>
+                
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Real Estate</h3>
+                
+                <p className="text-sm text-gray-600 mb-5 leading-relaxed">
+                  Premium property investments and development projects in high-growth markets worldwide.
+                </p>
+                
+                <Link href="/industries" className="text-gray-700 hover:text-gray-900 text-xs px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors inline-block">
+                  Read More
+                </Link>
+              </div>
+
+              {/* Stocks */}
+              <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-2 border border-gray-200">
+                <div className="w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center mb-5 overflow-hidden">
+                  {!industryImageErrors.stocks ? (
+                    <img 
+                      src="/industries/stocks.jpg" 
+                      alt="Stocks & Trading" 
+                      className="w-full h-full object-cover rounded-lg"
+                      onError={() => setIndustryImageErrors(prev => ({ ...prev, stocks: true }))}
+                    />
+                  ) : (
+                    <span className="text-gray-500 text-sm">Stocks & Trading</span>
+                  )}
+                </div>
+                
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Stocks</h3>
+                
+                <p className="text-sm text-gray-600 mb-5 leading-relaxed">
+                  Diversified equity portfolios focused on blue-chip companies and emerging market opportunities.
+                </p>
+                
+                <Link href="/industries" className="text-gray-700 hover:text-gray-900 text-xs px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors inline-block">
+                  Read More
+                </Link>
+              </div>
+
+              {/* AI Arbitrage */}
+              <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-2 border border-gray-200">
+                <div className="w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center mb-5 overflow-hidden">
+                  {!industryImageErrors.ai ? (
+                    <img 
+                      src="/industries/ai-arbitrage.png" 
+                      alt="AI Arbitrage Technology" 
+                      className="w-full h-full object-cover rounded-lg"
+                      onError={() => setIndustryImageErrors(prev => ({ ...prev, ai: true }))}
+                    />
+                  ) : (
+                    <span className="text-gray-500 text-sm">AI Arbitrage Technology</span>
+                  )}
+                </div>
+                
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">AI Arbitrage</h3>
+                
+                <p className="text-sm text-gray-600 mb-5 leading-relaxed">
+                  Advanced algorithmic trading strategies leveraging artificial intelligence for market inefficiencies.
+                </p>
+                
+                <Link href="/industries" className="text-gray-700 hover:text-gray-900 text-xs px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors inline-block">
+                  Read More
+                </Link>
+              </div>
+
+              {/* Agro Farming */}
+              <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-2 border border-gray-200">
+                <div className="w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center mb-5 overflow-hidden">
+                  {!industryImageErrors.agro ? (
+                    <img 
+                      src="/industries/agro-farming.jpg" 
+                      alt="Agriculture & Farming" 
+                      className="w-full h-full object-cover rounded-lg"
+                      onError={() => setIndustryImageErrors(prev => ({ ...prev, agro: true }))}
+                    />
+                  ) : (
+                    <span className="text-gray-500 text-sm">Agriculture & Farming</span>
+                  )}
+                </div>
+                
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Agro Farming</h3>
+                
+                <p className="text-sm text-gray-600 mb-5 leading-relaxed">
+                  Sustainable agriculture investments and modern farming technologies for food security.
+                </p>
+                
+                <Link href="/industries" className="text-gray-700 hover:text-gray-900 text-xs px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors inline-block">
+                  Read More
+                </Link>
+              </div>
+
+              {/* Gold Mining */}
+              <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-2 border border-gray-200">
+                <div className="w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center mb-5 overflow-hidden">
+                  {!industryImageErrors.gold ? (
+                    <img 
+                      src="/industries/gold-mining.jpg" 
+                      alt="Gold Mining Operations" 
+                      className="w-full h-full object-cover rounded-lg"
+                      onError={() => setIndustryImageErrors(prev => ({ ...prev, gold: true }))}
+                    />
+                  ) : (
+                    <span className="text-gray-500 text-sm">Gold Mining Operations</span>
+                  )}
+                </div>
+                
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Gold Mining</h3>
+                
+                <p className="text-sm text-gray-600 mb-5 leading-relaxed">
+                  Precious metals extraction and trading operations for portfolio stability and inflation hedging.
+                </p>
+                
+                <Link href="/industries" className="text-gray-700 hover:text-gray-900 text-xs px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors inline-block">
+                  Read More
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Team Section */}
+        <section className="py-20 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Leadership Team</h2>
+              <p className="text-xl text-gray-600">
+                Experienced professionals dedicated to your investment success.
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {[
+                { 
+                  initials: 'KM', 
+                  name: 'Kevin Marchetti', 
+                  role: 'Chief Lending Strategist', 
+                  desc: '15+ years experience in credit analysis and portfolio management',
+                  image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+                },
+                { 
+                  initials: 'RB', 
+                  name: 'Robby Bourgeois', 
+                  role: 'Chief Financial Officer', 
+                  desc: 'Financial planning and investment strategy expert',
+                  image: 'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+                },
+                { 
+                  initials: 'KC', 
+                  name: 'Keith Carter', 
+                  role: 'Head of Portfolio Origination', 
+                  desc: 'Originations leadership and client relationships',
+                  image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+                },
+                { 
+                  initials: 'MB', 
+                  name: 'Michael Blumberg', 
+                  role: 'Senior Managing Director', 
+                  desc: 'Chief Credit Officer and risk assessment specialist',
+                  image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+                }
+              ].map((member, index) => (
+                <div key={index} className="text-center bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-all hover:-translate-y-2 border border-gray-200">
+                  <div className="w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden">
+                    <img 
+                      src={member.image} 
+                      alt={`${member.name} - ${member.role}`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        // Fallback to initials if image fails to load
+                        e.currentTarget.style.display = 'none';
+                        const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                        if (fallback) fallback.style.display = 'flex';
+                      }}
+                    />
+                    <div className="w-full h-full bg-gray-100 rounded-full hidden items-center justify-center">
+                      <span className="text-xl font-bold text-gray-600">{member.initials}</span>
+                    </div>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">{member.name}</h3>
+                  <p className="text-sm text-blue-600 mb-2">{member.role}</p>
+                  <p className="text-xs text-gray-500">{member.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Testimonials */}
         {/* Testimonials Section */}
-        <section className="section-padding bg-white border-b border-gray-200">
-          <div className="container-responsive">
-            <div className="text-center mb-12">
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-800 mb-4">
-                Trusted by Investors Worldwide
-              </h2>
-              <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
-                Join thousands of satisfied investors who have achieved their financial goals with Everest Global Holdings.
+        <section className="py-20 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">Client Success Stories</h2>
+              <p className="text-xl text-gray-600">
+                Trusted by investors worldwide for consistent results.
               </p>
             </div>
-
-            {/* Testimonials Carousel */}
-            <div className="relative max-w-2xl mx-auto overflow-hidden rounded-lg">
-              <div 
-                className="flex transition-transform duration-500 ease-in-out"
-                style={{ transform: `translateX(-${testimonialIndex * 100}%)` }}
-              >
-                {/* Testimonial 1 */}
-                <div className="min-w-full bg-white p-6 sm:p-8 text-center shadow-sm">
-                  <div className="text-4xl sm:text-5xl text-gray-200 leading-none mb-4">"</div>
-                  <p className="text-sm sm:text-base text-slate-600 italic leading-relaxed mb-5 max-w-lg mx-auto">
-                    Everest Global Holdings has transformed my financial future. The returns are consistent and the platform is incredibly user-friendly.
+            
+            <div className="grid md:grid-cols-3 gap-8">
+              {[
+                { 
+                  quote: "Everest Global Holdings has transformed my financial future. The returns are consistent and the platform is incredibly user-friendly.", 
+                  name: "John Davidson", 
+                  role: "Senior Financial Analyst",
+                  image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                },
+                { 
+                  quote: "As a business owner, I needed reliable investment options. The Master Plan delivered exactly what was promised.", 
+                  name: "Sarah Mitchell", 
+                  role: "Business Owner",
+                  image: "/Sarah Mitchel.jpg"
+                },
+                { 
+                  quote: "I was skeptical about online investments, but the transparency convinced me. Three successful investments later, I'm very satisfied.", 
+                  name: "Robert Chen", 
+                  role: "Retired Engineer",
+                  image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                }
+              ].map((testimonial, index) => (
+                <div key={index} className="bg-white rounded-xl p-8 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
+                  <div className="text-5xl text-gray-300 mb-4">"</div>
+                  <p className="text-gray-600 mb-6 italic">
+                    {testimonial.quote}
                   </p>
-                  <p className="text-sm font-semibold text-slate-800">
-                    — John Davidson, Senior Financial Analyst
-                  </p>
+                  <div className="flex items-center">
+                    <div className="w-12 h-12 rounded-full mr-4 overflow-hidden">
+                      <img 
+                        src={testimonial.image} 
+                        alt={`${testimonial.name} - ${testimonial.role}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          // Fallback to gray placeholder if image fails
+                          e.currentTarget.style.display = 'none';
+                          const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.style.display = 'block';
+                        }}
+                      />
+                      <div className="w-full h-full bg-gray-100 rounded-full hidden items-center justify-center">
+                        <span className="text-sm font-bold text-gray-600">{testimonial.name.split(' ').map(n => n[0]).join('')}</span>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-900">{testimonial.name}</div>
+                      <div className="text-sm text-gray-600">{testimonial.role}</div>
+                    </div>
+                  </div>
                 </div>
-
-                {/* Testimonial 2 */}
-                <div className="min-w-full bg-white p-6 sm:p-8 text-center shadow-sm">
-                  <div className="text-4xl sm:text-5xl text-gray-200 leading-none mb-4">"</div>
-                  <p className="text-sm sm:text-base text-slate-600 italic leading-relaxed mb-5 max-w-lg mx-auto">
-                    As a business owner, I needed reliable investment options. Everest Global Holdings's Master Plan delivered exactly what was promised.
-                  </p>
-                  <p className="text-sm font-semibold text-slate-800">
-                    — Sarah Mitchell, Business Owner & Entrepreneur
-                  </p>
-                </div>
-
-                {/* Testimonial 3 */}
-                <div className="min-w-full bg-white p-6 sm:p-8 text-center shadow-sm">
-                  <div className="text-4xl sm:text-5xl text-gray-200 leading-none mb-4">"</div>
-                  <p className="text-sm sm:text-base text-slate-600 italic leading-relaxed mb-5 max-w-lg mx-auto">
-                    I was skeptical about online investments, but Everest Global Holdings's transparency convinced me. Three successful investments later, I'm very satisfied.
-                  </p>
-                  <p className="text-sm font-semibold text-slate-800">
-                    — Robert Chen, Retired Engineer
-                  </p>
-                </div>
-              </div>
-
-              {/* Carousel Navigation Dots */}
-              <div className="flex justify-center gap-3 mt-6">
-                {[0, 1, 2].map((index) => (
-                  <button
-                    key={index}
-                    onClick={() => setTestimonialIndex(index)}
-                    className={`w-2.5 h-2.5 rounded-full border-0 cursor-pointer transition-all ${
-                      testimonialIndex === index ? 'bg-slate-800' : 'bg-gray-200'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Team Members Section */}
-        <section className="section-padding container-responsive bg-gray-50 border-b border-gray-200">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-800 mb-4">
-              Meet Our Team
-            </h2>
-            <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
-              A team of dedicated professionals committed to exceeding your expectations.
-            </p>
-          </div>
-
-          {/* Team Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-6xl mx-auto">
-            {/* Team Member 1 */}
-            <div className="card-base p-5 text-center hover:shadow-lg transition-shadow">
-              <div className="w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden relative">
-                <img 
-                  src="/team/kevin-marchetti.jpg" 
-                  alt="Kevin Marchetti" 
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                    if (fallback) fallback.style.display = 'flex';
-                  }}
-                />
-                <div className="absolute inset-0 bg-slate-100 hidden items-center justify-center text-2xl font-bold text-slate-600">
-                  KM
-                </div>
-              </div>
-              
-              <h3 className="text-base font-bold text-slate-800 mb-1.5">Kevin Marchetti</h3>
-              <p className="text-xs text-slate-600 font-semibold mb-3">Head of US Direct Lending</p>
-              
-              <div className="text-xs text-slate-500 leading-tight space-y-1">
-                <div>• 15+ years experience</div>
-                <div>• Credit analysis expert</div>
-                <div>• Portfolio management</div>
-              </div>
-            </div>
-
-            {/* Team Member 2 */}
-            <div className="card-base p-5 text-center hover:shadow-lg transition-shadow">
-              <div className="w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden relative">
-                <img 
-                  src="/team/robby-bourgeois.jpg" 
-                  alt="Robby Bourgeois" 
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                    if (fallback) fallback.style.display = 'flex';
-                  }}
-                />
-                <div className="absolute inset-0 bg-slate-100 hidden items-center justify-center text-2xl font-bold text-slate-600">
-                  RB
-                </div>
-              </div>
-              
-              <h3 className="text-base font-bold text-slate-800 mb-1.5">Robby Bourgeois</h3>
-              <p className="text-xs text-slate-600 font-semibold mb-3">Chief Financial Officer</p>
-              
-              <div className="text-xs text-slate-500 leading-tight space-y-1">
-                <div>• Financial planning</div>
-                <div>• Investment strategy</div>
-                <div>• Risk management</div>
-              </div>
-            </div>
-
-            {/* Team Member 3 */}
-            <div className="card-base p-5 text-center hover:shadow-lg transition-shadow">
-              <div className="w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden relative">
-                <img 
-                  src="/team/keith-carter.jpg" 
-                  alt="Keith Carter" 
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                    if (fallback) fallback.style.display = 'flex';
-                  }}
-                />
-                <div className="absolute inset-0 bg-slate-100 hidden items-center justify-center text-2xl font-bold text-slate-600">
-                  KC
-                </div>
-              </div>
-              
-              <h3 className="text-base font-bold text-slate-800 mb-1.5">Keith Carter</h3>
-              <p className="text-xs text-slate-600 font-semibold mb-3">Senior Managing Director</p>
-              
-              <div className="text-xs text-slate-500 leading-tight space-y-1">
-                <div>• Originations leadership</div>
-                <div>• Client relationships</div>
-                <div>• Market development</div>
-              </div>
-            </div>
-
-            {/* Team Member 4 */}
-            <div className="card-base p-5 text-center hover:shadow-lg transition-shadow">
-              <div className="w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden relative">
-                <img 
-                  src="/team/michael-blumberg.jpg" 
-                  alt="Michael Blumberg" 
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                    if (fallback) fallback.style.display = 'flex';
-                  }}
-                />
-                <div className="absolute inset-0 bg-slate-100 hidden items-center justify-center text-2xl font-bold text-slate-600">
-                  MB
-                </div>
-              </div>
-              
-              <h3 className="text-base font-bold text-slate-800 mb-1.5">Michael Blumberg</h3>
-              <p className="text-xs text-slate-600 font-semibold mb-3">Senior Managing Director</p>
-              
-              <div className="text-xs text-slate-500 leading-tight space-y-1">
-                <div>• Chief Credit Officer</div>
-                <div>• Underwriting standards</div>
-                <div>• Credit risk assessment</div>
-              </div>
+              ))}
             </div>
           </div>
         </section>
 
         {/* CTA Section */}
-        <section className="section-padding bg-gray-50 border-t border-gray-200 border-b border-gray-200">
-          <div className="max-w-4xl mx-auto text-center px-4">
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-4">
-              Ready to Start Investing?
-            </h2>
-            <p className="text-base sm:text-lg text-slate-600 mb-8 leading-relaxed">
+        {/* CTA Section */}
+        <section className="py-20 bg-gray-600 text-white">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-4xl font-bold mb-6">Ready to Start Your Investment Journey?</h2>
+            <p className="text-xl mb-8 text-gray-200">
               Join thousands of investors who trust Everest Global Holdings for their financial growth.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link href="/signup" className="btn-primary hover:bg-blue-700 transition-colors">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/signup" className="bg-white text-gray-900 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
                 Start Investing Today
               </Link>
-              <Link href="/plans" className="btn-secondary hover:bg-gray-100 transition-colors">
-                View Investment Plans
-              </Link>
+              <button
+                onClick={() => setContactFormOpen(true)}
+                className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-gray-900 transition-colors"
+              >
+                Contact Us
+              </button>
             </div>
           </div>
         </section>
 
         {/* Footer */}
-        <footer className="bg-gray-800 text-white py-12 sm:py-16">
-          <div className="container-responsive">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-15 items-start">
-              {/* Left Side - Logo & Info */}
-              <div>
-                <div className="flex items-center mb-6">
-                  <img 
-                    src="/logo.png" 
-                    alt="Everest Global Holdings Logo" 
-                    className="h-12 w-auto"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                      const textElement = e.currentTarget.nextElementSibling as HTMLElement;
-                      if (textElement) textElement.style.display = 'block';
-                    }}
-                  />
-                  <h2 className="text-xl sm:text-2xl font-bold text-white m-0 hidden">
-                    Everest Global Holdings
-                  </h2>
-                </div>
-                
-                <div className="text-sm text-gray-300 leading-relaxed mb-6">
-                  <div className="flex items-center mb-2">
-                    <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    20-22 Wenlock Road, London, N1 7GU England
-                  </div>
-                </div>
-
-                {/* Contact Buttons */}
-                <div className="flex flex-col sm:flex-row gap-4 items-start">
-                  <button
-                    onClick={() => setContactFormOpen(true)}
-                    className="flex items-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-lg border-0 cursor-pointer text-sm font-medium hover:bg-blue-700 transition-colors"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    Contact Us
-                  </button>
-                  
-                  <a
-                    href="mailto:info@everestglobalholdings.com"
-                    className="flex items-center gap-2 text-gray-300 no-underline text-sm hover:text-white transition-colors"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    info@everestglobalholdings.com
-                  </a>
-                </div>
+       {/* Footer */}
+      <footer className="bg-gray-100 text-gray-800 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            {/* Logo and Company Info */}
+            <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4">
+              <div className="flex items-center">
+                <img 
+                  src="/logo.png" 
+                  alt="Everest Global Holdings Logo" 
+                  className="h-12 w-auto mr-2"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none'
+                    const textElement = e.currentTarget.nextElementSibling as HTMLElement
+                    if (textElement) textElement.style.display = 'block'
+                  }}
+                />
+                <div className="text-lg font-bold hidden">Everest Global Holdings</div>
               </div>
-
-              {/* Right Side - Quick Links */}
-              <div>
-                <h3 className="text-lg sm:text-xl font-semibold text-white mb-6">
-                  Quick Links
-                </h3>
-                
-                <ul className="list-none p-0 m-0 flex flex-col gap-3">
-                  <li>
-                    <Link href="/" className="text-gray-300 no-underline text-base hover:text-white transition-colors block">
-                      Home
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/about" className="text-gray-300 no-underline text-base hover:text-white transition-colors block">
-                      About
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/plans" className="text-gray-300 no-underline text-base hover:text-white transition-colors block">
-                      Investment Plans
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/industries" className="text-gray-300 no-underline text-base hover:text-white transition-colors block">
-                      Industries
-                    </Link>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => setContactFormOpen(true)}
-                      className="text-gray-300 bg-transparent border-0 text-base cursor-pointer hover:text-white transition-colors text-left p-0"
-                    >
-                      Contact
-                    </button>
-                  </li>
-                </ul>
+              
+              {/* Address */}
+              <div className="text-sm text-gray-600">
+                20-22 Wenlock Road, London, N1 7GU England
               </div>
             </div>
-
-            {/* Copyright */}
-            <div className="border-t border-gray-600 mt-12 pt-6 text-center text-gray-400 text-sm">
-              © 2025 Everest Global Holdings. All rights reserved.
+            
+            {/* Legal Links */}
+            <div className="flex items-center space-x-6 text-sm">
+              <Link href="/privacy" className="text-gray-600 hover:text-gray-800 transition-colors">
+                Privacy Policy
+              </Link>
+              <span className="text-gray-400">/</span>
+              <Link href="/terms" className="text-gray-600 hover:text-gray-800 transition-colors">
+                Terms of Use
+              </Link>
             </div>
           </div>
-        </footer>
+          
+          {/* Copyright */}
+          <div className="mt-6 pt-4 border-t border-gray-300 text-center">
+            <p className="text-sm text-gray-600">
+              &copy; 2025 Everest Global Holdings. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
 
         {/* Contact Form Modal */}
         {contactFormOpen && (
-          <div className="modal-overlay">
-            <div className="modal-container">
-              {/* Close Button */}
-              <button
-                onClick={() => setContactFormOpen(false)}
-                className="absolute top-4 right-4 bg-transparent border-0 text-2xl cursor-pointer text-gray-500 hover:text-gray-700"
-              >
-                ×
-              </button>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+              <div className="relative p-6">
+                <button
+                  onClick={() => setContactFormOpen(false)}
+                  className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl bg-transparent border-0 cursor-pointer"
+                >
+                  ×
+                </button>
 
-              <div className="modal-header">
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 m-0">
-                  Contact Us
-                </h2>
-              </div>
-              
-              <div className="modal-body">
-                <p className="text-sm sm:text-base text-gray-600 mb-6">
-                  Send us a message and we'll get back to you as soon as possible.
-                </p>
-
-                <form onSubmit={handleContactSubmit} className="space-y-5">
-                  <div className="form-group">
-                    <label className="form-label">Name *</label>
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Contact Us</h2>
+                  <p className="text-gray-600">
+                    Send us a message and we'll get back to you as soon as possible.
+                  </p>
+                </div>
+                
+                <form onSubmit={handleContactSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
                     <input
                       type="text"
                       required
                       value={contactForm.name}
                       onChange={(e) => setContactForm(prev => ({ ...prev, name: e.target.value }))}
-                      className="form-input"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                       placeholder="Your full name"
                     />
                   </div>
 
-                  <div className="form-group">
-                    <label className="form-label">Email *</label>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
                     <input
                       type="email"
                       required
                       value={contactForm.email}
                       onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
-                      className="form-input"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                       placeholder="your.email@example.com"
                     />
                   </div>
 
-                  <div className="form-group">
-                    <label className="form-label">Message *</label>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Message *</label>
                     <textarea
                       required
-                      rows={5}
+                      rows={4}
                       value={contactForm.message}
                       onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
-                      className="form-textarea"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent resize-none"
                       placeholder="Tell us how we can help you..."
                     />
                   </div>
 
-                  <div className="modal-footer">
+                  <div className="flex gap-3 pt-4">
                     <button
                       type="button"
                       onClick={() => setContactFormOpen(false)}
-                      className="btn-secondary"
+                      className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="btn-primary"
+                      className="flex-1 px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors"
                     >
                       Send Message
                     </button>

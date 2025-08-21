@@ -59,3 +59,17 @@ module.exports = {
     require('@tailwindcss/forms'),
   ],
 }
+
+module.exports = {
+  content: ['./pages/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        charcoal: '#1C1C1C',
+        royalBlue: '#2563EB',
+        lightTeal: '#14B8A6',
+        coolGray: '#F3F4F6'
+      }
+    }
+  }
+}

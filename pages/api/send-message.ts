@@ -18,24 +18,46 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ApiResponse>
 ) {
+  console.log('📧 API /send-message called:', {
+    method: req.method,
+    hasBody: !!req.body,
+    userAgent: req.headers['user-agent']?.substring(0, 50) + '...',
+    timestamp: new Date().toISOString()
+  })
+
   // Only allow POST requests
   if (req.method !== 'POST') {
+    console.log('❌ Method not allowed:', req.method)
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
   try {
+    console.log('📋 Request body received:', {
+      hasEmail: !!req.body?.userEmail,
+      hasMessage: !!req.body?.message,
+      hasTimestamp: !!req.body?.timestamp,
+      bodySize: JSON.stringify(req.body || {}).length
+    })
+
     const { userEmail, message, timestamp }: MessageRequest = req.body
 
     // Validate required fields
     if (!userEmail || !message) {
+      console.log('❌ Validation failed - missing fields:', {
+        hasEmail: !!userEmail,
+        hasMessage: !!message
+      })
       return res.status(400).json({ error: 'Missing required fields: userEmail and message are required' })
     }
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(userEmail)) {
+      console.log('❌ Invalid email format:', userEmail.substring(0, 10) + '...')
       return res.status(400).json({ error: 'Invalid email format' })
     }
+
+    console.log('✅ Validation passed for email:', userEmail.substring(0, 10) + '...')
 
     // Check if SendGrid is configured
     if (!process.env.SENDGRID_API_KEY) {
@@ -220,27 +242,33 @@ Reply to this email to respond directly to the user.
       message: 'Message sent successfully to admin team' 
     })
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('❌ Error sending message:', error)
+    console.error('❌ Error details:', {
+      name: (error as Error)?.name,
+      message: (error as Error)?.message,
+      code: (error as any)?.code,
+      response: (error as any)?.response?.status || 'N/A'
+    })
     
     // Handle specific SendGrid errors
-    if (error.response?.body?.errors) {
-      const sgErrors = error.response.body.errors
+    if ((error as any).response?.body?.errors) {
+      const sgErrors = (error as any).response.body.errors
       console.error('SendGrid errors:', sgErrors)
       
       // Check for common SendGrid issues
-      if (sgErrors.some((e: any) => e.message?.includes('does not contain a valid address'))) {
+      if (sgErrors.some((e: unknown) => (e as any).message?.includes('does not contain a valid address'))) {
         return res.status(400).json({ error: 'Invalid email configuration. Please contact support.' })
       }
       
-      if (sgErrors.some((e: any) => e.message?.includes('The from address does not match a verified Sender Identity'))) {
+      if (sgErrors.some((e: unknown) => (e as any).message?.includes('The from address does not match a verified Sender Identity'))) {
         return res.status(500).json({ error: 'Email service configuration error. Please contact support.' })
       }
     }
 
     res.status(500).json({ 
       error: 'Failed to send message. Please try again or contact support directly.',
-      ...(process.env.NODE_ENV === 'development' && { details: error?.message || 'Unknown error' })
+      ...(process.env.NODE_ENV === 'development' && { details: (error as Error)?.message || 'Unknown error' })
     })
   }
 }

@@ -86,12 +86,14 @@ export function useDashboard() {
 
           if (createError) {
             console.error('❌ Error creating balance:', createError)
+            toast.error('Failed to create balance record')
             throw createError
           }
           console.log('✅ Balance created:', newBalance)
           setUserBalance(newBalance)
         } else {
           console.error('❌ Balance fetch error:', error)
+          toast.error('Failed to fetch balance data')
           throw error
         }
       } else {
@@ -116,6 +118,7 @@ export function useDashboard() {
 
       if (error) {
         console.error('❌ Investments fetch error:', error)
+        toast.error('Failed to fetch investments data')
         throw error
       }
       
@@ -139,6 +142,7 @@ export function useDashboard() {
 
       if (error) {
         console.error('❌ Transactions fetch error:', error)
+        toast.error('Failed to fetch transaction history')
         throw error
       }
       
@@ -171,7 +175,9 @@ export function useDashboard() {
       console.log('✅ Dashboard data fetch completed')
     } catch (error: any) {
       console.error('❌ Error in fetchDashboardData:', error)
-      setError('Failed to fetch dashboard data')
+      const errorMessage = 'Failed to fetch dashboard data'
+      setError(errorMessage)
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
       setInitialized(true)
@@ -196,8 +202,9 @@ export function useDashboard() {
       setUserBalance(data)
       return data
     } catch (error: any) {
-      console.error('Error updating balance:', error)
-      toast.error('Failed to update balance')
+      console.error('❌ Balance update error:', error)
+      const errorMessage = error?.message || 'Failed to update balance'
+      toast.error(errorMessage)
       throw error
     }
   }, [user?.id, supabase])
@@ -224,8 +231,9 @@ export function useDashboard() {
       toast.success('Investment created successfully!')
       return data
     } catch (error: any) {
-      console.error('Error creating investment:', error)
-      toast.error('Failed to create investment')
+      console.error('❌ Investment creation error:', error)
+      const errorMessage = error?.message || 'Failed to create investment'
+      toast.error(errorMessage)
       throw error
     }
   }, [user?.id, supabase])
@@ -251,8 +259,9 @@ export function useDashboard() {
       
       return data
     } catch (error: any) {
-      console.error('Error creating transaction:', error)
-      toast.error('Failed to record transaction')
+      console.error('❌ Transaction creation error:', error)
+      const errorMessage = error?.message || 'Failed to record transaction'
+      toast.error(errorMessage)
       throw error
     }
   }, [user?.id, supabase])

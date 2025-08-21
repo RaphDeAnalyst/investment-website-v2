@@ -51,14 +51,20 @@ export function SignUpForm() {
     
     if (!validateForm()) return
 
-    const { data, error } = await signUp(
-      formData.email,
-      formData.password,
-      formData.fullName
-    )
+    try {
+      const { data, error } = await signUp(
+        formData.email,
+        formData.password,
+        formData.fullName
+      )
 
-    if (data?.user && !error) {
-      router.push('/dashboard')
+      if (data?.user && !error) {
+        router.push('/dashboard')
+      } else if (error) {
+        console.error('❌ Sign up form error:', error)
+      }
+    } catch (error: unknown) {
+      console.error('❌ Sign up form submission error:', error)
     }
   }
 

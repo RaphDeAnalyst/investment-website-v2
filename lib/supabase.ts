@@ -1,5 +1,5 @@
 // lib/supabase.ts (Fixed version)
-import { createBrowserClient } from '@supabase/ssr'
+import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -14,12 +14,18 @@ if (!supabaseAnonKey) {
 }
 
 // Singleton pattern to ensure we only create one client
-let supabaseInstance: ReturnType<typeof createBrowserClient> | null = null
+let supabaseInstance: ReturnType<typeof createClient> | null = null
 
 export const createSupabaseClient = () => {
   if (!supabaseInstance) {
     console.log('🔄 Creating new Supabase client...')
-    supabaseInstance = createBrowserClient(supabaseUrl, supabaseAnonKey)
+    supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true
+      }
+    })
     console.log('✅ Supabase client created successfully')
   }
   return supabaseInstance

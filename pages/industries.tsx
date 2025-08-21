@@ -1,536 +1,514 @@
-// pages/industries.tsx - Mobile Responsive Version
 import { useState } from 'react'
-import Head from 'next/head'
 import Link from 'next/link'
-import { ChevronDown, ChevronUp, TrendingUp, Shield, Users, Star, CheckCircle } from 'lucide-react'
 import { ChatWidget } from '../components/ChatWidget'
 
-export default function IndustriesPage() {
-  const [activeIndustry, setActiveIndustry] = useState<number | null>(null)
-  const [activeFAQ, setActiveFAQ] = useState<number | null>(null)
+export default function ExpertisePage() {
+  const [activeExpertise, setActiveExpertise] = useState('oil-gas')
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [contactFormOpen, setContactFormOpen] = useState(false)
+  const [contactForm, setContactForm] = useState({
+    name: '',
+    email: '',
+    message: ''
+  })
 
-  // Industries from homepage
-  const industries = [
-    {
-      id: 1,
-      name: 'Oil & Gas',
-      summary: 'Strategic investments in energy infrastructure and renewable oil alternatives for sustainable returns.',
-      details: {
-        overview: 'Our Oil & Gas portfolio focuses on strategic investments across the entire energy value chain, from upstream exploration to downstream refining operations. We target companies with strong fundamentals, proven reserves, and innovative approaches to sustainable energy production.',
-        keyAreas: [
-          'Upstream exploration and production companies',
-          'Midstream pipeline and transportation infrastructure',
-          'Downstream refining and petrochemical facilities',
-          'Renewable oil alternatives and biofuels',
-          'Energy storage and distribution technologies'
-        ],
-        marketOpportunity: 'The global oil and gas market is valued at over $3.3 trillion, with continued demand driven by emerging markets and industrial growth. Despite the shift toward renewable energy, oil and gas remain critical components of the global energy mix for the foreseeable future.',
-        investmentStrategy: 'We employ a diversified approach, balancing traditional energy investments with forward-looking renewable alternatives. Our strategy emphasizes companies with strong ESG practices, efficient operations, and adaptability to changing market conditions.',
-        riskManagement: 'Our risk management approach includes geographic diversification, commodity price hedging, and careful evaluation of regulatory environments. We focus on companies with strong balance sheets and proven ability to navigate commodity cycles.',
-        returns: 'Historical returns in this sector have averaged 12-15% annually, with dividend yields typically ranging from 4-8%. Our selective approach has consistently outperformed sector benchmarks.'
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    try {
+      console.log('📨 Submitting contact form from Industries page:', {
+        name: contactForm.name,
+        email: contactForm.email,
+        messageLength: contactForm.message.length
+      })
+
+      const response = await fetch('/api/send-message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userEmail: contactForm.email,
+          message: `Name: ${contactForm.name}\n\nMessage: ${contactForm.message}\n\nSource: Industries Page`,
+          timestamp: new Date().toISOString()
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        console.error('❌ Industries page contact form API error:', response.status, errorData)
+        throw new Error(errorData.error || `HTTP ${response.status}: Failed to send message`)
       }
-    },
-    {
-      id: 2,
-      name: 'Real Estate',
-      summary: 'Premium commercial and residential properties across major metropolitan markets worldwide.',
-      details: {
-        overview: 'Our Real Estate investments span commercial, residential, and mixed-use properties in prime locations across major metropolitan areas. We focus on assets with strong cash flow potential, appreciation prospects, and strategic value in growing markets.',
-        keyAreas: [
-          'Prime commercial office buildings in business districts',
-          'Luxury residential developments and apartment complexes',
-          'Retail and shopping centers in high-traffic locations',
-          'Industrial and logistics facilities',
-          'Mixed-use developments combining residential and commercial spaces'
-        ],
-        marketOpportunity: 'The global real estate market represents over $280 trillion in value, with institutional-quality properties offering stable income streams and long-term appreciation potential. Urban population growth and changing work patterns create new investment opportunities.',
-        investmentStrategy: 'We target properties in markets with strong demographic trends, economic growth, and infrastructure development. Our approach emphasizes location quality, tenant diversity, and properties with value-add potential through renovation or repositioning.',
-        riskManagement: 'Risk mitigation includes geographic diversification, tenant diversification, and thorough due diligence on market fundamentals. We maintain conservative leverage ratios and focus on markets with strong regulatory frameworks.',
-        returns: 'Real estate investments typically generate 8-12% annual returns through a combination of rental income and property appreciation. Our portfolio has consistently delivered above-market performance with lower volatility.'
-      }
-    },
-    {
-      id: 3,
-      name: 'Stocks',
-      summary: 'Diversified equity portfolios targeting blue-chip companies and high-growth opportunities.',
-      details: {
-        overview: 'Our Stock portfolio encompasses a carefully curated selection of public equities across multiple sectors and market capitalizations. We focus on companies with strong fundamentals, competitive advantages, and sustainable growth prospects in both domestic and international markets.',
-        keyAreas: [
-          'Large-cap blue-chip companies with proven track records',
-          'Growth stocks in emerging sectors and technologies',
-          'Dividend-paying stocks for income generation',
-          'International equities for global diversification',
-          'ESG-focused companies with sustainable business practices'
-        ],
-        marketOpportunity: 'Global equity markets represent over $100 trillion in value, providing vast opportunities for capital appreciation and income generation. Market innovations, technological disruption, and emerging market growth continue to create new investment opportunities.',
-        investmentStrategy: 'We employ a fundamental analysis approach, focusing on companies with strong balance sheets, competitive moats, and experienced management teams. Our strategy balances growth and value investing while maintaining sector and geographic diversification.',
-        riskManagement: 'Risk management includes diversification across sectors, market caps, and geographies. We use stop-loss orders, position sizing, and regular portfolio rebalancing to manage downside risk while capturing upside potential.',
-        returns: 'Stock investments have historically generated 10-12% annual returns over the long term. Our active management approach aims to outperform market indices while managing volatility through strategic allocation and timing.'
-      }
-    },
-    {
-      id: 4,
-      name: 'Technology',
-      summary: 'Cutting-edge tech companies driving digital transformation and innovation across industries.',
-      details: {
-        overview: 'Our Technology portfolio targets companies at the forefront of digital innovation, from established tech giants to emerging disruptors. We focus on businesses with scalable models, strong competitive moats, and transformative potential across various sectors.',
-        keyAreas: [
-          'Cloud computing and Software-as-a-Service (SaaS) platforms',
-          'Artificial Intelligence and Machine Learning technologies',
-          'Cybersecurity and data protection solutions',
-          'Fintech and digital payment platforms',
-          'Biotechnology and healthcare technology innovations'
-        ],
-        marketOpportunity: 'The global technology market exceeds $5 trillion, with continued growth driven by digital transformation, AI adoption, and emerging technologies. The sector offers significant scalability and margin expansion potential.',
-        investmentStrategy: 'We invest in companies with proven business models, strong management teams, and sustainable competitive advantages. Our focus includes both growth-stage companies and established technology leaders with continued innovation potential.',
-        riskManagement: 'Technology investments require careful evaluation of competitive positioning, technological obsolescence risk, and regulatory challenges. We diversify across subsectors and stages of company maturity to manage portfolio risk.',
-        returns: 'Technology investments have historically generated 15-25% annual returns, though with higher volatility. Our disciplined approach focuses on companies with strong fundamentals and long-term growth prospects.'
-      }
-    },
-    {
-      id: 5,
-      name: 'Agriculture',
-      summary: 'Sustainable agricultural investments in farmland, food production, and agritech innovations.',
-      details: {
-        overview: 'Our Agriculture portfolio encompasses farmland investments, food production companies, and agricultural technology innovations. We focus on sustainable farming practices, food security solutions, and technologies that improve agricultural productivity and efficiency.',
-        keyAreas: [
-          'Premium farmland in high-yield agricultural regions',
-          'Sustainable farming and organic food production',
-          'Agricultural technology and precision farming solutions',
-          'Food processing and distribution companies',
-          'Water management and irrigation systems'
-        ],
-        marketOpportunity: 'The global agriculture market is valued at over $4 trillion, driven by growing global population, rising food demand, and the need for sustainable farming practices. Climate change and food security concerns create new investment opportunities.',
-        investmentStrategy: 'We target agricultural assets with strong fundamentals, including soil quality, water access, and favorable climate conditions. Our approach emphasizes sustainable practices, technological adoption, and value-chain integration.',
-        riskManagement: 'Agricultural investments face weather, commodity price, and regulatory risks. We diversify across geographic regions, crop types, and agricultural subsectors while focusing on climate-resilient farming practices.',
-        returns: 'Agricultural investments typically generate 8-14% annual returns through a combination of land appreciation and operational income. The sector provides natural inflation protection and portfolio diversification benefits.'
-      }
-    },
-    {
-      id: 6,
-      name: 'Cryptocurrency',
-      summary: 'Digital asset investments in established cryptocurrencies and blockchain technologies.',
-      details: {
-        overview: 'Our Cryptocurrency portfolio includes strategic investments in major digital assets, blockchain technologies, and crypto-related infrastructure. We focus on established cryptocurrencies with strong fundamentals and emerging blockchain applications with real-world utility.',
-        keyAreas: [
-          'Major cryptocurrencies like Bitcoin and Ethereum',
-          'DeFi protocols and decentralized applications',
-          'Blockchain infrastructure and mining operations',
-          'NFTs and digital collectibles platforms',
-          'Cryptocurrency exchanges and trading platforms'
-        ],
-        marketOpportunity: 'The cryptocurrency market has grown to over $2 trillion in total market capitalization, with increasing institutional adoption and regulatory clarity. Blockchain technology applications continue to expand across multiple industries.',
-        investmentStrategy: 'We employ a research-driven approach, focusing on cryptocurrencies with strong technological foundations, active development communities, and clear use cases. Our strategy includes both long-term holdings and tactical trading opportunities.',
-        riskManagement: 'Cryptocurrency investments are inherently volatile and require careful risk management. We use position sizing, diversification across assets, and regular portfolio rebalancing to manage the high-risk, high-reward nature of digital assets.',
-        returns: 'Cryptocurrency investments have shown potential for significant returns, with Bitcoin and Ethereum delivering substantial gains over the long term. However, volatility is high, and investors should expect significant price fluctuations.'
-      }
+
+      const result = await response.json()
+      console.log('✅ Industries page contact form sent successfully:', result)
+      
+      setContactForm({ name: '', email: '', message: '' })
+      setContactFormOpen(false)
+      alert('Thank you for your message! We have received it and will get back to you soon.')
+      
+    } catch (error: unknown) {
+      console.error('❌ Industries page contact form submission error:', error)
+      const errorMessage = (error as Error)?.message || 'Sorry, there was an error sending your message. Please try again.'
+      alert(errorMessage)
     }
-  ]
-
-  const faqs = [
-    {
-      id: 1,
-      question: 'What is the minimum investment amount?',
-      answer: 'Our minimum investment varies by plan: Compact Plan requires $200 minimum, Master Plan requires $20,000, and Ultimate Plan requires $100,000. These minimums ensure we can effectively deploy capital and provide meaningful returns to our investors.'
-    },
-    {
-      id: 2,
-      question: 'How are returns distributed across different industries?',
-      answer: 'Returns vary by industry based on market conditions and risk profiles. Technology typically offers 15-25% returns with higher volatility, while Real Estate provides 8-12% returns with more stability. We provide detailed performance metrics for each industry to help you make informed decisions.'
-    },
-    {
-      id: 3,
-      question: 'Can I invest in multiple industries simultaneously?',
-      answer: 'Absolutely! We encourage diversification across multiple industries to balance risk and optimize returns. Our investment platform allows you to allocate funds across different sectors based on your risk tolerance and investment goals.'
-    },
-    {
-      id: 4,
-      question: 'What is your risk management strategy?',
-      answer: 'We employ comprehensive risk management including geographic diversification, sector allocation limits, regular portfolio rebalancing, and thorough due diligence. Each industry has specific risk mitigation strategies tailored to its unique characteristics and market dynamics.'
-    },
-    {
-      id: 5,
-      question: 'How often can I review my investment performance?',
-      answer: 'You can access your investment dashboard 24/7 to monitor performance in real-time. We provide monthly detailed reports, quarterly strategy updates, and annual comprehensive reviews. Our transparent reporting ensures you\'re always informed about your investments.'
-    },
-    {
-      id: 6,
-      question: 'What fees are associated with investing?',
-      answer: 'We maintain a transparent fee structure with no hidden charges. Management fees vary by investment plan and are clearly outlined before you invest. We believe in aligning our success with yours through performance-based compensation.'
-    }
-  ]
-
-  const toggleIndustry = (id: number) => {
-    setActiveIndustry(activeIndustry === id ? null : id)
   }
 
-  const toggleFAQ = (id: number) => {
-    setActiveFAQ(activeFAQ === id ? null : id)
+  const expertiseData = {
+    'oil-gas': {
+      title: 'Oil & Gas',
+      icon: '⚡',
+      content: {
+        overview: 'Strategic investments in energy sector companies and exploration projects with stable long-term returns across Australia and Canada\'s most promising fields.',
+        highlights: [
+          'Access to premium LNG export opportunities in growing Asian markets',
+          'Direct participation in proven drilling operations with experienced partners',
+          'Attractive tax deductions including Intangible Drilling Costs (IDC)',
+          'Monthly revenue streams within 90 days of initial investment'
+        ],
+        investment_focus: 'We focus on proven operators in lower-risk zones, leveraging Australia\'s strategic position as a major LNG exporter to meet growing demand from China and India.',
+        returns: 'Investors benefit from passive income streams, significant tax advantages, and portfolio diversification independent of traditional stock market fluctuations.',
+        why_choose: 'Over decades of energy industry experience, elite access to compelling mineral tracts, and partnerships with operators using cutting-edge drilling technology for maximum yields.'
+      }
+    },
+    'real-estate': {
+      title: 'Real Estate',
+      icon: '🏢',
+      content: {
+        overview: 'Premium property investments and development projects in high-growth markets worldwide, focusing on sustainable appreciation and income generation.',
+        highlights: [
+          'Strategic commercial and residential developments in emerging markets',
+          'Direct ownership opportunities in prime metropolitan locations',
+          'Consistent rental income streams with capital appreciation potential',
+          'Professional property management and maintenance services included'
+        ],
+        investment_focus: 'We target undervalued properties in growth corridors, luxury developments in stable markets, and commercial real estate with strong tenant profiles.',
+        returns: 'Dual benefit of regular rental income plus long-term capital gains, with typical annual returns ranging from 8-15% depending on market conditions.',
+        why_choose: 'Extensive market research capabilities, established relationships with leading developers, and comprehensive due diligence processes ensure quality opportunities.'
+      }
+    },
+    'stocks': {
+      title: 'Stocks & Equities',
+      icon: '📈',
+      content: {
+        overview: 'Diversified equity portfolios focused on blue-chip companies and emerging market opportunities, managed by experienced financial professionals.',
+        highlights: [
+          'Balanced portfolios across multiple sectors and geographic regions',
+          'Focus on dividend-paying stocks for consistent income generation',
+          'Growth opportunities in emerging technologies and markets',
+          'Professional risk management and portfolio rebalancing'
+        ],
+        investment_focus: 'We emphasize fundamentally strong companies with proven track records, sustainable competitive advantages, and strong management teams.',
+        returns: 'Target annual returns of 10-18% through a combination of capital appreciation and dividend income, with quarterly portfolio reviews.',
+        why_choose: 'Rigorous fundamental analysis, advanced market research tools, and decades of combined investment experience across global markets.'
+      }
+    },
+    'ai-arbitrage': {
+      title: 'AI Arbitrage',
+      icon: '🤖',
+      content: {
+        overview: 'Advanced algorithmic trading strategies leveraging artificial intelligence to identify and capitalize on market inefficiencies across global financial markets.',
+        highlights: [
+          'Proprietary AI algorithms for real-time market analysis',
+          'High-frequency trading capabilities across multiple exchanges',
+          'Risk-managed arbitrage opportunities in forex, crypto, and commodities',
+          'Consistent returns independent of overall market direction'
+        ],
+        investment_focus: 'Our AI systems identify price discrepancies across markets, executing trades within milliseconds to capture profit margins unavailable to traditional investors.',
+        returns: 'Target monthly returns of 2-5% through systematic arbitrage strategies, with daily monitoring and risk adjustment protocols.',
+        why_choose: 'Cutting-edge technology infrastructure, experienced quantitative analysts, and proven algorithmic strategies with extensive backtesting results.'
+      }
+    },
+    'agro-farming': {
+      title: 'Agro Farming',
+      icon: '🌾',
+      content: {
+        overview: 'Sustainable agriculture investments and modern farming technologies focused on food security, environmental stewardship, and profitable crop production.',
+        highlights: [
+          'Investment in precision agriculture and smart farming technologies',
+          'Sustainable crop production with environmental responsibility',
+          'Direct partnerships with experienced agricultural operators',
+          'Growing global demand for organic and specialty crops'
+        ],
+        investment_focus: 'We invest in fertile farmland, modern irrigation systems, and agricultural technology that increases yields while promoting sustainability.',
+        returns: 'Annual returns of 6-12% through crop sales, land appreciation, and agricultural technology licensing, with inflation hedge benefits.',
+        why_choose: 'Deep agricultural expertise, relationships with top farming operations, and focus on sustainable practices that ensure long-term viability.'
+      }
+    },
+    'gold-mining': {
+      title: 'Gold Mining',
+      icon: '🏆',
+      content: {
+        overview: 'Precious metals extraction and trading operations providing portfolio stability, inflation protection, and exposure to one of history\'s most reliable stores of value.',
+        highlights: [
+          'Direct investment in proven gold mining operations worldwide',
+          'Portfolio hedge against inflation and currency devaluation',
+          'Physical gold storage and trading opportunities',
+          'Strategic partnerships with established mining companies'
+        ],
+        investment_focus: 'We target established mines with proven reserves, new exploration projects in geologically favorable regions, and gold trading opportunities.',
+        returns: 'Long-term appreciation potential with gold price appreciation, plus immediate returns from mining operations and trading activities.',
+        why_choose: 'Geological expertise, established mining partnerships, secure storage facilities, and comprehensive understanding of precious metals markets.'
+      }
+    }
   }
+
+  const expertiseKeys = Object.keys(expertiseData)
+  const currentExpertise = expertiseData[activeExpertise as keyof typeof expertiseData]
 
   return (
-    <>
-      <Head>
-        <title>Investment Industries - Everest Global Holdings</title>
-        <meta name="description" content="Explore our comprehensive investment opportunities across six major industries including Oil & Gas, Real Estate, Technology, Agriculture, Stocks, and Cryptocurrency." />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 font-sans">
-        {/* Header */}
-        <header className="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-40">
-          <div className="container-responsive flex h-16 justify-between items-center">
-            {/* Left Side - Logo */}
-            <div className="flex items-center">
-              <img 
-                src="/logo.png" 
-                alt="Everest Global Holdings Logo" 
-                className="h-16 sm:h-20 w-auto"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                  const textElement = e.currentTarget.nextElementSibling as HTMLElement;
-                  if (textElement) textElement.style.display = 'block';
-                }}
-              />
-              <h1 className="text-lg sm:text-xl font-bold text-slate-800 m-0 hidden">
-                Investment<span className="text-slate-600">Pro</span>
-              </h1>
-            </div>
-
-            {/* Right Side - Navigation */}
-            <div className="hidden sm:flex items-center gap-4 lg:gap-6">
-              <Link href="/" className="text-gray-700 no-underline text-sm font-medium px-3 py-2 rounded-lg transition-colors hover:bg-gray-100">
-                Home
-              </Link>
-
-              <Link href="/signin" className="text-slate-800 no-underline font-medium text-sm px-3 py-2 rounded-lg border-2 border-slate-800 transition-all hover:bg-slate-800 hover:text-white">
-                Sign In
-              </Link>
-
-              <Link href="/signup" className="bg-slate-800 text-white no-underline font-medium text-sm px-4 py-2.5 rounded-lg transition-all hover:bg-slate-700">
-                Get Started
-              </Link>
-            </div>
-
-            {/* Mobile Menu Button */}
-            <div className="sm:hidden">
-              <Link href="/signup" className="bg-slate-800 text-white no-underline font-medium text-sm px-4 py-2 rounded-lg">
-                Get Started
-              </Link>
-            </div>
-          </div>
-        </header>
-
-        {/* Main Content */}
-        <main className="section-padding">
-          <div className="container-narrow">
-            {/* Page Header */}
-            <div className="welcome-section mb-8 sm:mb-12">
-              <h1 className="welcome-title">
-                Investment Industries
-              </h1>
-              <p className="welcome-subtitle">
-                Explore our comprehensive investment opportunities across six major industries, each offering unique growth potential and strategic advantages.
-              </p>
-            </div>
-
-            {/* Stats Bar */}
-            <div className="stats-grid mb-8 sm:mb-12">
-              {[
-                { icon: Users, value: '10,000+', label: 'Active Investors' },
-                { icon: TrendingUp, value: '$2.5B', label: 'Assets Under Management' },
-                { icon: Shield, value: '98.5%', label: 'Success Rate' },
-                { icon: Star, value: '4.9/5', label: 'Client Satisfaction' }
-              ].map((stat, index) => (
-                <div key={index} className="card-base p-4 sm:p-6 text-center">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                    <stat.icon size={20} className="sm:w-6 sm:h-6 text-slate-800" />
-                  </div>
-                  <div className="stat-number text-slate-800 mb-1">
-                    {stat.value}
-                  </div>
-                  <div className="stat-label text-slate-600">
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Industries Accordion */}
-            <div className="flex flex-col gap-4 mb-12 sm:mb-16">
-              {industries.map((industry) => (
-                <div
-                  key={industry.id}
-                  className="card-base overflow-hidden transition-all hover:shadow-md"
-                >
-                  {/* Industry Header */}
-                  <button
-                    onClick={() => industry.id && toggleIndustry(industry.id)}
-                    className={`w-full p-4 sm:p-6 border-0 cursor-pointer flex items-center justify-between transition-colors ${
-                      activeIndustry === industry.id ? 'bg-slate-50' : 'bg-white hover:bg-slate-50'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 sm:gap-4 text-left flex-1">
-                      <div className="min-w-0 flex-1">
-                        <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-slate-800 mb-1 sm:mb-2">
-                          {industry.name}
-                        </h2>
-                        <p className="text-sm sm:text-base text-slate-600 m-0 leading-relaxed">
-                          {industry.summary}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-slate-600 ml-4 flex-shrink-0">
-                      {activeIndustry === industry.id ? (
-                        <ChevronUp size={20} className="sm:w-6 sm:h-6" />
-                      ) : (
-                        <ChevronDown size={20} className="sm:w-6 sm:h-6" />
-                      )}
-                    </div>
-                  </button>
-
-                  {/* Industry Details */}
-                  {activeIndustry === industry.id && (
-                    <div className="p-4 sm:p-6 border-t border-gray-100 bg-slate-50">
-                      <div className="flex flex-col gap-6 sm:gap-8">
-                        {/* Overview */}
-                        <div>
-                          <h3 className="text-base sm:text-lg font-semibold text-slate-800 mb-3">
-                            Overview
-                          </h3>
-                          <p className="text-sm sm:text-base text-slate-700 leading-relaxed m-0">
-                            {industry.details.overview}
-                          </p>
-                        </div>
-
-                        {/* Two Column Layout for Key Areas and Market Opportunity */}
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-                          {/* Key Investment Areas */}
-                          <div>
-                            <h3 className="text-base sm:text-lg font-semibold text-slate-800 mb-3">
-                              Key Investment Areas
-                            </h3>
-                            <ul className="list-none p-0 m-0 space-y-2">
-                              {industry.details.keyAreas.map((area, index) => (
-                                <li key={index} className="text-sm sm:text-base text-slate-700 pl-5 relative">
-                                  <span className="absolute left-0 top-2 w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
-                                  {area}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          {/* Market Opportunity */}
-                          <div>
-                            <h3 className="text-base sm:text-lg font-semibold text-slate-800 mb-3">
-                              Market Opportunity
-                            </h3>
-                            <p className="text-sm sm:text-base text-slate-700 leading-relaxed m-0">
-                              {industry.details.marketOpportunity}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Investment Strategy and Risk Management */}
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-                          <div>
-                            <h3 className="text-base sm:text-lg font-semibold text-slate-800 mb-3">
-                              Investment Strategy
-                            </h3>
-                            <p className="text-sm sm:text-base text-slate-700 leading-relaxed m-0">
-                              {industry.details.investmentStrategy}
-                            </p>
-                          </div>
-
-                          <div>
-                            <h3 className="text-base sm:text-lg font-semibold text-slate-800 mb-3">
-                              Risk Management
-                            </h3>
-                            <p className="text-sm sm:text-base text-slate-700 leading-relaxed m-0">
-                              {industry.details.riskManagement}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Expected Returns */}
-                        <div className="bg-white p-4 sm:p-5 rounded-lg border border-gray-200">
-                          <h3 className="text-base sm:text-lg font-semibold text-slate-800 mb-3">
-                            Expected Returns
-                          </h3>
-                          <p className="text-sm sm:text-base text-slate-700 leading-relaxed m-0">
-                            {industry.details.returns}
-                          </p>
-                        </div>
-
-                        {/* CTA Button */}
-                        <div className="text-center mt-4">
-                          <Link href="/signup" className="bg-slate-800 text-white no-underline font-semibold text-sm sm:text-base px-6 sm:px-8 py-3 rounded-lg inline-block transition-all hover:bg-slate-700">
-                            Start Investing in {industry.name}
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {/* Bottom CTA */}
-            <div className="text-center mb-12 sm:mb-16 p-6 sm:p-8 lg:p-12 bg-white rounded-2xl border border-gray-200">
-              <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-3 sm:mb-4">
-                Ready to Diversify Your Portfolio?
-              </h2>
-              <p className="text-base sm:text-lg text-slate-600 mb-6 sm:mb-8 max-w-3xl mx-auto">
-                Join thousands of investors who trust Everest Global Holdings to manage their investments across these dynamic industries.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
-                <Link href="/signup" className="w-full sm:w-auto bg-slate-800 text-white no-underline font-semibold text-base px-6 sm:px-7 py-3 sm:py-3.5 rounded-lg transition-all hover:bg-slate-700">
-                  Get Started Today
-                </Link>
-                <Link href="/signin" className="w-full sm:w-auto bg-transparent text-slate-800 no-underline font-semibold text-base px-6 sm:px-7 py-3 sm:py-3.5 rounded-lg border-2 border-slate-800 transition-all hover:bg-slate-800 hover:text-white">
-                  Sign In
-                </Link>
-              </div>
-            </div>
-
-            {/* FAQ Section */}
-            <div className="mb-12 sm:mb-16">
-              <div className="text-center mb-8 sm:mb-12">
-                <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-3 sm:mb-4">
-                  Frequently Asked Questions
-                </h2>
-                <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto">
-                  Get answers to common questions about our investment opportunities and processes.
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-4">
-                {faqs.map((faq) => (
-                  <div
-                    key={faq.id}
-                    className="card-base overflow-hidden"
-                  >
-                    <button
-                      onClick={() => toggleFAQ(faq.id)}
-                      className={`w-full p-4 sm:p-6 border-0 cursor-pointer flex items-center justify-between transition-colors text-left ${
-                        activeFAQ === faq.id ? 'bg-slate-50' : 'bg-white hover:bg-slate-50'
-                      }`}
-                    >
-                      <h3 className="text-base sm:text-lg font-semibold text-slate-800 m-0 pr-4 leading-relaxed">
-                        {faq.question}
-                      </h3>
-                      <div className="text-slate-600 flex-shrink-0">
-                        {activeFAQ === faq.id ? (
-                          <ChevronUp size={18} className="sm:w-5 sm:h-5" />
-                        ) : (
-                          <ChevronDown size={18} className="sm:w-5 sm:h-5" />
-                        )}
-                      </div>
-                    </button>
-
-                    {activeFAQ === faq.id && (
-                      <div className="p-4 sm:p-6 border-t border-gray-100 bg-slate-50">
-                        <p className="text-sm sm:text-base text-slate-700 leading-relaxed m-0">
-                          {faq.answer}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </main>
-
-        {/* Footer */}
-        <footer className="bg-slate-800 text-white pt-12 sm:pt-15 pb-8 sm:pb-10">
-          <div className="container-responsive">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-15 items-start">
-              {/* Left Side - Logo & Info */}
-              <div>
-                <div className="flex items-center mb-6">
+    <div className="min-h-screen bg-gray-50">
+      {/* Navigation */}
+       <nav className="fixed w-full top-0 bg-white/95 backdrop-blur-sm shadow-sm z-50 border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-20">
+              {/* Logo - Bigger than homepage */}
+              <div className="flex items-center">
+                <Link href="/" className="flex items-center gap-3 no-underline">
                   <img 
                     src="/logo.png" 
-                    alt="Everest Global Holdings Logo"
-                    className="h-10 sm:h-12 w-auto"
+                    alt="Everest Global Holdings Logo" 
+                    className="h-16 w-auto"
                     onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                      const textElement = e.currentTarget.nextElementSibling as HTMLElement;
-                      if (textElement) textElement.style.display = 'block';
+                      // First fallback
+                      if (e.currentTarget.src !== "/everest-logo.png") {
+                        e.currentTarget.src = "/everest-logo.png"
+                      } else {
+                        // Final fallback to company initials
+                        e.currentTarget.style.display = 'none';
+                        const fallbackElement = e.currentTarget.nextElementSibling as HTMLElement;
+                        if (fallbackElement) fallbackElement.style.display = 'flex';
+                      }
                     }}
                   />
-                  <h2 className="text-xl sm:text-2xl font-bold text-white m-0 hidden">
-                    Investment<span className="text-slate-400">Pro</span>
-                  </h2>
-                </div>
-                
-                <div className="text-sm text-slate-400 leading-relaxed mb-6">
-                  <div className="flex items-center mb-2">
-                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="mr-2">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    20-22 Wenlock Road, London, N1 7GU England
+                  <div className="w-14 h-14 bg-blue-600 rounded-xl items-center justify-center hidden">
+                    <span className="text-white font-bold text-2xl">E</span>
                   </div>
+                  <div className="text-2xl font-bold text-gray-900">
+                    Everest <span className="text-gray-600">Global Holdings</span>
+                  </div>
+                </Link>
+              </div>
+              
+              {/* Desktop Navigation */}
+              <div className="hidden md:flex items-center space-x-8">
+                <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Home</Link>
+                 <button
+                  onClick={() => setContactFormOpen(true)}
+                  className="text-gray-700 hover:text-gray-900 font-medium transition-colors bg-transparent border-0 cursor-pointer"
+                >
+                  Contact
+                </button>
+              </div>
+              
+              {/* CTA Buttons */}
+              <div className="flex items-center space-x-4">
+                <Link href="/signin" className="hidden sm:block text-gray-700 hover:text-gray-900 font-medium transition-colors">
+                  Sign In
+                </Link>
+                <Link href="/signup" className="bg-blue-600 text-white px-6 py-3 rounded-2xl hover:bg-blue-700 font-medium transition-colors">
+                  Get Started
+                </Link>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+      {/* Hero Section */}
+      <section className="pt-24 pb-12 bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-4xl lg:text-5xl font-bold mb-6">
+            Our Investment Expertise
+          </h1>
+          <p className="text-xl text-gray-200 max-w-3xl mx-auto leading-relaxed">
+            Diversified portfolio management across high-growth sectors with proven track records. 
+            Explore our specialized investment strategies designed to maximize returns while managing risk.
+          </p>
+        </div>
+      </section>
+
+      {/* Expertise Navigation Tabs */}
+      <section className="bg-white shadow-sm sticky top-16 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex overflow-x-auto py-4 space-x-2 sm:space-x-4">
+            {expertiseKeys.map((key) => {
+              const expertise = expertiseData[key as keyof typeof expertiseData]
+              const isActive = activeExpertise === key
+              return (
+                <button
+                  key={key}
+                  onClick={() => setActiveExpertise(key)}
+                  className={`flex items-center space-x-2 px-4 sm:px-6 py-3 rounded-lg font-medium transition-all whitespace-nowrap ${
+                    isActive 
+                      ? 'bg-blue-400 text-white shadow-lg' 
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  <span className="text-lg">{expertise.icon}</span>
+                  <span>{expertise.title}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Expertise Content */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-gray-500 to-gray-500 px-8 py-8 text-white">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="text-4xl">{currentExpertise.icon}</div>
+                <h2 className="text-3xl font-bold">{currentExpertise.title}</h2>
+              </div>
+              <p className="text-xl text-gray-200 leading-relaxed">
+                {currentExpertise.content.overview}
+              </p>
+            </div>
+
+            {/* Content Grid */}
+            <div className="p-8">
+              <div className="grid lg:grid-cols-2 gap-12">
+                {/* Left Column */}
+                <div className="space-y-8">
+                  {/* Key Highlights */}
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                      <svg className="w-6 h-6 text-blue-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                      </svg>
+                      Key Highlights
+                    </h3>
+                    <ul className="space-y-4">
+                      {currentExpertise.content.highlights.map((highlight, index) => (
+                        <li key={index} className="flex items-start">
+                          <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-4 flex-shrink-0"></div>
+                          <span className="text-gray-700 leading-relaxed">{highlight}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Investment Focus */}
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                      <svg className="w-6 h-6 text-green-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                      </svg>
+                      Investment Focus
+                    </h3>
+                    <p className="text-gray-700 leading-relaxed text-lg">
+                      {currentExpertise.content.investment_focus}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Right Column */}
+                <div className="space-y-8">
+                  {/* Expected Returns */}
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                      <svg className="w-6 h-6 text-yellow-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                      </svg>
+                      Returns & Benefits
+                    </h3>
+                    <p className="text-gray-700 leading-relaxed text-lg">
+                      {currentExpertise.content.returns}
+                    </p>
+                  </div>
+
+                  {/* Why Choose Us */}
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                      <svg className="w-6 h-6 text-purple-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                      </svg>
+                      Why Choose Everest
+                    </h3>
+                    <p className="text-gray-700 leading-relaxed text-lg">
+                      {currentExpertise.content.why_choose}
+                    </p>
+                  </div>
+
+                  {/* CTA */}
+                  <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                    <h4 className="text-xl font-bold text-gray-900 mb-3">Ready to Invest?</h4>
+                    <p className="text-gray-600 mb-4">
+                      Start your journey with {currentExpertise.title} investments today.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <Link href="/signup" className="bg-blue-600 text-white px-6 py-3 rounded-2xl hover:bg-blue-700 font-medium transition-colors text-center">
+                        Get Started
+                      </Link>
+                      <button
+                        onClick={() => setContactFormOpen(true)}
+                        className="border-2 border-gray-300 text-gray-700 px-6 py-3 rounded-2xl hover:border-gray-400 font-medium transition-colors text-center"
+                      >
+                        Learn More
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Additional CTA Section */}
+      <section className="py-16 bg-blue-600 text-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold mb-6">
+            Diversify Your Portfolio Across Multiple Sectors
+          </h2>
+          <p className="text-xl mb-8 text-gray-200">
+            Don't limit yourself to one investment type. Explore our comprehensive range of 
+            expertise areas to build a robust, diversified portfolio.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/signup" className="bg-white text-blue-600 px-8 py-4 rounded-2xl font-semibold hover:bg-gray-100 transition-colors">
+              Start Investing Today
+            </Link>
+            <button
+              onClick={() => setContactFormOpen(true)}
+              className="border-2 border-white text-white px-8 py-4 rounded-2xl font-semibold hover:bg-white hover:text-blue-600 transition-colors"
+            >
+              Contact Us
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+     <footer className="bg-gray-100 text-gray-800 py-8">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+      <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4">
+        <div className="flex items-center">
+          <img 
+            src="/logo.png" 
+            alt="Everest Global Holdings Logo" 
+            className="h-16 w-auto mr-2"
+            onError={(e) => {
+              // First fallback
+              if (e.currentTarget.src !== "/everest-logo.png") {
+                e.currentTarget.src = "/everest-logo.png"
+              } else {
+                // Final fallback to company initials
+                e.currentTarget.style.display = 'none';
+                const fallbackElement = e.currentTarget.nextElementSibling as HTMLElement;
+                if (fallbackElement) fallbackElement.style.display = 'flex';
+              }
+            }}
+          />
+          <div className="w-8 h-8 bg-blue-600 rounded-lg items-center justify-center mr-2 hidden">
+            <span className="text-white font-bold">E</span>
+          </div>
+          <div className="text-lg font-bold">Everest Global Holdings</div>
+        </div>
+        <div className="text-sm text-gray-600">
+          20-22 Wenlock Road, London, N1 7GU England
+        </div>
+      </div>
+      
+      <div className="flex items-center space-x-6 text-sm">
+        <Link href="/privacy" className="text-gray-600 hover:text-gray-800 transition-colors">
+          Privacy Policy
+        </Link>
+        <span className="text-gray-400">/</span>
+        <Link href="/terms" className="text-gray-600 hover:text-gray-800 transition-colors">
+          Terms of Use
+        </Link>
+      </div>
+    </div>
+    
+    <div className="mt-6 pt-4 border-t border-gray-300 text-center">
+      <p className="text-sm text-gray-600">
+        &copy; 2025 Everest Global Holdings. All rights reserved.
+      </p>
+    </div>
+  </div>
+</footer>
+
+      {/* Contact Form Modal */}
+      {contactFormOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="relative p-6">
+              <button
+                onClick={() => setContactFormOpen(false)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl bg-transparent border-0 cursor-pointer"
+              >
+                ×
+              </button>
+
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Contact Us</h2>
+                <p className="text-gray-600">
+                  Send us a message and we'll get back to you as soon as possible.
+                </p>
+              </div>
+              
+              <form onSubmit={handleContactSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={contactForm.name}
+                    onChange={(e) => setContactForm(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Your full name"
+                  />
                 </div>
 
                 <div>
-                  <button className="flex items-center gap-2 bg-slate-700 text-white px-4 sm:px-5 py-2.5 sm:py-3 rounded-lg border-0 cursor-pointer text-sm font-medium transition-all hover:bg-slate-600">
-                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    Contact Us
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                  <input
+                    type="email"
+                    required
+                    value={contactForm.email}
+                    onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="your.email@example.com"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Message *</label>
+                  <textarea
+                    required
+                    rows={4}
+                    value={contactForm.message}
+                    onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    placeholder="Tell us how we can help you..."
+                  />
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setContactFormOpen(false)}
+                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Send Message
                   </button>
                 </div>
-              </div>
-
-              {/* Right Side - Quick Links */}
-              <div>
-                <h3 className="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6">
-                  Quick Links
-                </h3>
-                
-                <ul className="list-none p-0 m-0 flex flex-col gap-2 sm:gap-3">
-                  <li>
-                    <Link href="/" className="text-slate-300 no-underline text-base transition-colors hover:text-white block">
-                      Home
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/about" className="text-slate-300 no-underline text-base transition-colors hover:text-white block">
-                      About
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/plans" className="text-slate-300 no-underline text-base transition-colors hover:text-white block">
-                      Investment Plans
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/industries" className="text-slate-300 no-underline text-base transition-colors hover:text-white block">
-                      Industries
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/signin" className="text-slate-300 no-underline text-base transition-colors hover:text-white block">
-                      Sign In
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Copyright */}
-            <div className="border-t border-slate-700 mt-8 sm:mt-12 pt-4 sm:pt-6 text-center text-slate-400 text-sm">
-              © 2025 Everest Global Holdings. All rights reserved.
+              </form>
             </div>
           </div>
-        </footer>
+        </div>
+      )}
 
-        {/* Chat Widget */}
-        <ChatWidget />
-      </div>
-    </>
+      <ChatWidget />
+    </div>
   )
 }

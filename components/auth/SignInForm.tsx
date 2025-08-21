@@ -36,10 +36,16 @@ export function SignInForm() {
     
     if (!validateForm()) return
 
-    const { data, error } = await signIn(formData.email, formData.password)
+    try {
+      const { data, error } = await signIn(formData.email, formData.password)
 
-    if (data?.user && !error) {
-      router.push('/dashboard')
+      if (data?.user && !error) {
+        router.push('/dashboard')
+      } else if (error) {
+        console.error('❌ Sign in form error:', error)
+      }
+    } catch (error: unknown) {
+      console.error('❌ Sign in form submission error:', error)
     }
   }
 
