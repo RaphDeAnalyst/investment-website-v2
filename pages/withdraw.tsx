@@ -176,7 +176,7 @@ export default function Withdraw() {
     setSubmitting(true)
 
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('withdrawal_requests')
         .insert([{
           user_id: user.id,
@@ -185,8 +185,43 @@ export default function Withdraw() {
           wallet_address: form.walletAddress,
           status: 'pending'
         }])
+        .select()
 
       if (error) throw error
+
+      // Send email notifications (don't block on email failures)
+      try {
+        const emailPayload = {
+          user: {
+            id: user.id,
+            email: profile?.email || user.email || '',
+            full_name: profile?.full_name || ''
+          },
+          request: {
+            id: data[0].id,
+            amount: parseFloat(form.amount),
+            payment_method: form.paymentMethod,
+            wallet_address: form.walletAddress,
+            created_at: data[0].created_at
+          }
+        }
+
+        console.log('📧 Sending withdrawal notifications...')
+        const emailResponse = await fetch('/api/notifications/withdrawal-request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(emailPayload)
+        })
+
+        if (emailResponse.ok) {
+          console.log('✅ Withdrawal notifications sent successfully')
+        } else {
+          console.warn('⚠️ Withdrawal notifications failed, but withdrawal was created')
+        }
+      } catch (emailError) {
+        console.warn('⚠️ Email notification error:', emailError)
+        // Don't throw - email failure shouldn't break the withdrawal flow
+      }
 
       // Reset form
       setForm({

@@ -37,6 +37,7 @@ interface PaymentState {
 
 export default function Investment() {
   const [user, setUser] = useState<any>(null)
+  const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [calculator, setCalculator] = useState<CalculatorState>({
     selectedPlan: null,
@@ -153,6 +154,7 @@ export default function Investment() {
           return
         }
         setUser(user)
+        await fetchUserData(user.id)
       } catch (error) {
         router.push('/')
       } finally {
@@ -162,6 +164,22 @@ export default function Investment() {
 
     checkAuth()
   }, [])
+
+  const fetchUserData = async (userId: string) => {
+    try {
+      // Fetch user profile
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
+
+      if (profileError) throw profileError
+      setProfile(profileData)
+    } catch (error) {
+      console.error('Error fetching user data:', error)
+    }
+  }
 
   // Fetch BTC rate from multiple sources
   const fetchBTCRate = async () => {
@@ -379,6 +397,75 @@ export default function Investment() {
       }
       
       console.log('✅ Payment submitted successfully!')
+      
+      // Send email notifications (don't block on email failures)
+      try {
+        // Ensure we have a valid email address
+        const userEmail = profile?.email || user?.email || ''
+        
+        console.log('📧 Preparing investment notification email payload...', {
+          userId: user.id,
+          profileEmail: profile?.email,
+          userEmail: user?.email,
+          finalEmail: userEmail,
+          hasProfile: !!profile,
+          profileData: profile ? { id: profile.id, email: profile.email, name: profile.full_name } : 'No profile'
+        })
+
+        if (!userEmail) {
+          console.error('❌ No email address found for investment notification')
+          throw new Error('No email address available')
+        }
+
+        const emailPayload = {
+          user: {
+            id: user.id,
+            email: userEmail,
+            full_name: profile?.full_name || ''
+          },
+          request: {
+            id: data[0].id,
+            plan_name: submissionData.plan_name,
+            amount_usd: submissionData.amount_usd,
+            expected_return: submissionData.expected_return,
+            duration_days: submissionData.duration_days,
+            interest_rate: submissionData.interest_rate,
+            payment_method: submissionData.payment_method,
+            transaction_hash: submissionData.transaction_hash,
+            maturity_date: submissionData.maturity_date,
+            created_at: data[0].created_at
+          }
+        }
+
+        console.log('📧 Sending investment notifications with payload:', {
+          userEmail: emailPayload.user.email,
+          requestId: emailPayload.request.id,
+          planName: emailPayload.request.plan_name,
+          amount: emailPayload.request.amount_usd
+        })
+
+        const emailResponse = await fetch('/api/notifications/investment-request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(emailPayload)
+        })
+
+        const responseText = await emailResponse.text()
+        console.log('📧 Investment notification API response:', {
+          status: emailResponse.status,
+          statusText: emailResponse.statusText,
+          response: responseText
+        })
+
+        if (emailResponse.ok) {
+          console.log('✅ Investment notifications sent successfully')
+        } else {
+          console.warn('⚠️ Investment notifications failed:', responseText)
+        }
+      } catch (emailError) {
+        console.error('❌ Email notification error:', emailError)
+        // Don't throw - email failure shouldn't break the investment flow
+      }
       
       // Reset states and redirect
       setPayment({ isOpen: false, selectedMethod: '', step: 'method', btcRate: 0, loading: false })

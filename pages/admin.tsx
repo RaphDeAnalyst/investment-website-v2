@@ -235,6 +235,71 @@ export default function AdminPanel() {
       }
 
       console.log('✅ Investment approved successfully')
+      
+      // Send approval email notification (don't block on email failures)
+      try {
+        console.log('📧 Preparing investment approval notification...', {
+          investmentUserId: investment.user_id,
+          userEmail: investment.user_email,
+          userName: investment.user_name
+        })
+
+        if (!investment.user_email) {
+          console.error('❌ No user email found for investment approval notification')
+          throw new Error('No user email found')
+        }
+
+        const emailPayload = {
+          user: {
+            id: investment.user_id,
+            email: investment.user_email,
+            full_name: investment.user_name || ''
+          },
+          action: 'approve',
+          type: 'investment',
+          request: {
+            id: investment.id,
+            plan_name: investment.plan_name,
+            amount_usd: investment.amount_usd,
+            expected_return: investment.expected_return,
+            duration_days: investment.duration_days,
+            interest_rate: investment.interest_rate,
+            payment_method: investment.payment_method,
+            transaction_hash: investment.transaction_hash,
+            maturity_date: maturityDate.toISOString(),
+            created_at: investment.created_at
+          }
+        }
+
+        console.log('📧 Sending investment approval notification with payload:', {
+          userEmail: emailPayload.user.email,
+          action: emailPayload.action,
+          type: emailPayload.type,
+          requestId: emailPayload.request.id
+        })
+
+        const emailResponse = await fetch('/api/notifications/admin-action', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(emailPayload)
+        })
+
+        const responseText = await emailResponse.text()
+        console.log('📧 Investment approval notification API response:', {
+          status: emailResponse.status,
+          statusText: emailResponse.statusText,
+          response: responseText
+        })
+
+        if (emailResponse.ok) {
+          console.log('✅ Investment approval notification sent')
+        } else {
+          console.warn('⚠️ Investment approval notification failed:', responseText)
+        }
+      } catch (emailError) {
+        console.error('❌ Investment approval email notification error:', emailError)
+      }
+
       toast.success('Investment approved successfully!')
       await fetchData()
 
@@ -266,6 +331,52 @@ export default function AdminPanel() {
       }
 
       console.log('✅ Investment rejected successfully')
+      
+      // Send rejection email notification (don't block on email failures)
+      try {
+        const investment = pendingInvestments.find(inv => inv.id === investmentId)
+        
+        if (investment && investment.user_email) {
+          const emailPayload = {
+            user: {
+              id: investment.user_id,
+              email: investment.user_email,
+              full_name: investment.user_name || ''
+            },
+            action: 'reject',
+            type: 'investment',
+            request: {
+              id: investment.id,
+              plan_name: investment.plan_name,
+              amount_usd: investment.amount_usd,
+              expected_return: investment.expected_return,
+              duration_days: investment.duration_days,
+              interest_rate: investment.interest_rate,
+              payment_method: investment.payment_method,
+              transaction_hash: investment.transaction_hash,
+              maturity_date: investment.maturity_date,
+              created_at: investment.created_at
+            },
+            reason: 'Investment request was rejected by admin review'
+          }
+
+          console.log('📧 Sending investment rejection notification...')
+          const emailResponse = await fetch('/api/notifications/admin-action', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(emailPayload)
+          })
+
+          if (emailResponse.ok) {
+            console.log('✅ Investment rejection notification sent')
+          } else {
+            console.warn('⚠️ Investment rejection notification failed')
+          }
+        }
+      } catch (emailError) {
+        console.warn('⚠️ Email notification error:', emailError)
+      }
+
       toast.success('Investment rejected')
       await fetchData()
 
@@ -339,6 +450,43 @@ export default function AdminPanel() {
       }
 
       console.log('✅ Withdrawal approved successfully')
+      
+      // Send approval email notification (don't block on email failures)
+      try {
+        const emailPayload = {
+          user: {
+            id: withdrawal.user_id,
+            email: withdrawal.user_email || '',
+            full_name: withdrawal.user_name || ''
+          },
+          action: 'approve',
+          type: 'withdrawal',
+          request: {
+            id: withdrawal.id,
+            amount: withdrawal.amount,
+            payment_method: withdrawal.payment_method,
+            wallet_address: withdrawal.wallet_address,
+            created_at: withdrawal.created_at
+          },
+          transactionHash: 'To be provided by blockchain network'
+        }
+
+        console.log('📧 Sending withdrawal approval notification...')
+        const emailResponse = await fetch('/api/notifications/admin-action', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(emailPayload)
+        })
+
+        if (emailResponse.ok) {
+          console.log('✅ Withdrawal approval notification sent')
+        } else {
+          console.warn('⚠️ Withdrawal approval notification failed')
+        }
+      } catch (emailError) {
+        console.warn('⚠️ Email notification error:', emailError)
+      }
+
       toast.success('Withdrawal approved successfully!')
       await fetchData()
 
@@ -385,6 +533,47 @@ export default function AdminPanel() {
       }
 
       console.log('✅ Withdrawal rejected successfully')
+      
+      // Send rejection email notification (don't block on email failures)
+      try {
+        const withdrawal = withdrawalRequests.find(w => w.id === withdrawalId)
+        
+        if (withdrawal && withdrawal.user_email) {
+          const emailPayload = {
+            user: {
+              id: withdrawal.user_id,
+              email: withdrawal.user_email,
+              full_name: withdrawal.user_name || ''
+            },
+            action: 'reject',
+            type: 'withdrawal',
+            request: {
+              id: withdrawal.id,
+              amount: withdrawal.amount,
+              payment_method: withdrawal.payment_method,
+              wallet_address: withdrawal.wallet_address,
+              created_at: withdrawal.created_at
+            },
+            reason: 'Withdrawal request was rejected by admin review'
+          }
+
+          console.log('📧 Sending withdrawal rejection notification...')
+          const emailResponse = await fetch('/api/notifications/admin-action', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(emailPayload)
+          })
+
+          if (emailResponse.ok) {
+            console.log('✅ Withdrawal rejection notification sent')
+          } else {
+            console.warn('⚠️ Withdrawal rejection notification failed')
+          }
+        }
+      } catch (emailError) {
+        console.warn('⚠️ Email notification error:', emailError)
+      }
+
       toast.success('Withdrawal rejected')
       await fetchData()
 

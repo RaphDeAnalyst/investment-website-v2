@@ -106,3 +106,9 @@ CREATE TABLE public.withdrawal_requests (
   CONSTRAINT withdrawal_requests_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
   CONSTRAINT withdrawal_requests_approved_by_fkey FOREIGN KEY (approved_by) REFERENCES auth.users(id)
 );
+
+# SendGrid Configuration 
+
+SENDGRID_API_KEY=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
+SENDGRID_FROM_EMAIL=raphandy007@gmail.com
+ADMIN_EMAIL=raphandy007@gmail.com
