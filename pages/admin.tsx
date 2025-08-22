@@ -170,11 +170,13 @@ export default function AdminPanel() {
       setWithdrawalRequests(withdrawalsWithBalance)
       console.log('✅ Withdrawals loaded:', withdrawalsWithBalance.length)
 
+
     } catch (error) {
       console.error('Error fetching admin data:', error)
       toast.error('Failed to load admin data: ' + (error as Error).message)
     }
   }
+
 
   const approveInvestment = async (investmentId: string) => {
     setProcessing(investmentId)
@@ -1261,6 +1263,7 @@ export default function AdminPanel() {
                   )}
                 </div>
               )}
+
             </div>
           </div>
 

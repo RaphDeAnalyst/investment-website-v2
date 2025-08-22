@@ -497,6 +497,11 @@ export default function Dashboard() {
   const totalInvested = investments.reduce((sum: number, inv: any) => sum + inv.amount_invested, 0)
   const expectedReturns = investments.reduce((sum: number, inv: any) => sum + inv.expected_return_amount, 0)
   const totalWithdrawn = balance?.total_withdrawn || 0
+  
+  // Calculate real portfolio performance
+  const totalCurrentValue = investments.reduce((sum: number, inv: any) => sum + (inv.current_value || inv.amount_invested), 0)
+  const totalGains = totalCurrentValue - totalInvested
+  const totalReturnPercentage = totalInvested > 0 ? ((totalGains / totalInvested) * 100) : 0
 
   return (
     <>
@@ -767,7 +772,9 @@ export default function Dashboard() {
                               <div className="space-y-3">
                                 <div className="flex justify-between items-center">
                                   <span className="text-sm text-gray-500">Total Return</span>
-                                  <span className="text-sm font-medium text-green-600">+{((totalInvested * 0.038).toFixed(0))} (3.8%)</span>
+                                  <span className={`text-sm font-medium ${totalGains >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                    {totalGains >= 0 ? '+' : ''}{formatCurrency(totalGains)} ({totalReturnPercentage >= 0 ? '+' : ''}{totalReturnPercentage.toFixed(1)}%)
+                                  </span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                   <span className="text-sm text-gray-500">Active Investments</span>

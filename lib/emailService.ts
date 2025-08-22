@@ -41,6 +41,18 @@ export interface WithdrawalRequestData {
   created_at: string
 }
 
+export interface MaturedInvestmentData {
+  id: string
+  user_id: string
+  user_email: string
+  user_name: string
+  investment_name: string
+  amount_invested: number
+  expected_return_amount: number
+  total_return: number
+  maturity_date: string
+}
+
 export class EmailService {
   private static fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@everestglobal.com'
   private static adminEmail = process.env.ADMIN_EMAIL || 'admin@everestglobal.com'
@@ -1168,6 +1180,275 @@ Everest Global Holdings Team
 
 ---
 This is an automated message from Everest Global Holdings.
+    `
+  }
+
+  // Investment Maturity Notification Methods
+  static async sendInvestmentMaturityNotification(user: UserData, investment: MaturedInvestmentData): Promise<boolean> {
+    const config: EmailConfig = {
+      to: user.email,
+      subject: `🎉 Investment Matured - ${investment.investment_name}`,
+      html: this.generateInvestmentMaturityHTML(user, investment),
+      text: this.generateInvestmentMaturityText(user, investment)
+    }
+    return this.sendEmail(config)
+  }
+
+  static async sendMaturityProcessingSummary(investments: MaturedInvestmentData[], summary: string): Promise<boolean> {
+    const config: EmailConfig = {
+      to: this.adminEmail,
+      subject: `📊 Daily Investment Maturity Processing Summary - ${new Date().toLocaleDateString()}`,
+      html: this.generateMaturitySummaryHTML(investments, summary),
+      text: this.generateMaturitySummaryText(investments, summary)
+    }
+    return this.sendEmail(config)
+  }
+
+  private static generateInvestmentMaturityHTML(user: UserData, investment: MaturedInvestmentData): string {
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Investment Matured</title>
+      </head>
+      <body style="margin: 0; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+          
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #059669, #10b981); padding: 30px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 24px; font-weight: 600;">
+              🎉 Investment Matured!
+            </h1>
+            <p style="color: rgba(255, 255, 255, 0.9); margin: 8px 0 0 0; font-size: 14px;">
+              Everest Global Holdings
+            </p>
+          </div>
+
+          <!-- Content -->
+          <div style="padding: 30px;">
+            <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+              Dear ${user.full_name || user.email},
+            </p>
+            
+            <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+              Congratulations! Your investment has successfully matured and the returns have been added to your account balance.
+            </p>
+
+            <!-- Investment Details -->
+            <div style="background: #f0fdf4; border-left: 4px solid #10b981; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+              <h3 style="color: #111827; margin: 0 0 16px 0; font-size: 18px; font-weight: 600;">
+                Investment Summary
+              </h3>
+              <div style="display: grid; gap: 8px;">
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #6b7280; font-weight: 500;">Investment:</span>
+                  <span style="color: #111827; font-weight: 600;">${investment.investment_name}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #6b7280; font-weight: 500;">Principal Amount:</span>
+                  <span style="color: #111827; font-weight: 600;">$${investment.amount_invested.toLocaleString()}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #6b7280; font-weight: 500;">Returns Earned:</span>
+                  <span style="color: #059669; font-weight: 600;">+$${investment.expected_return_amount.toLocaleString()}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-top: 1px solid #d1d5db; padding-top: 8px; margin-top: 8px;">
+                  <span style="color: #111827; font-weight: 600; font-size: 18px;">Total Payout:</span>
+                  <span style="color: #059669; font-weight: 700; font-size: 18px;">$${investment.total_return.toLocaleString()}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #6b7280; font-weight: 500;">Maturity Date:</span>
+                  <span style="color: #111827; font-weight: 600;">${new Date(investment.maturity_date).toLocaleDateString()}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- New Balance Info -->
+            <div style="background: #EDE8D0; border-radius: 8px; padding: 20px; margin-bottom: 24px; text-center;">
+              <h3 style="color: #111827; margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">
+                💰 Funds Added to Your Account
+              </h3>
+              <p style="color: #6b7280; font-size: 14px; line-height: 1.5; margin: 0;">
+                The total payout of <strong>$${investment.total_return.toLocaleString()}</strong> has been automatically added to your available balance. You can now reinvest these funds or request a withdrawal.
+              </p>
+            </div>
+
+            <!-- CTA Buttons -->
+            <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+              <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://everestglobal.com'}/dashboard" 
+                 style="flex: 1; display: block; padding: 12px 20px; background: linear-gradient(135deg, #059669, #10b981); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; text-align: center;">
+                View Dashboard
+              </a>
+              <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://everestglobal.com'}/investment" 
+                 style="flex: 1; display: block; padding: 12px 20px; background: linear-gradient(135deg, #111827, #374151); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; text-align: center;">
+                Reinvest Now
+              </a>
+            </div>
+
+            <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0;">
+              Thank you for choosing Everest Global Holdings for your investment needs. We look forward to continuing to grow your wealth together.
+            </p>
+            
+            <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 20px 0 0 0;">
+              Best regards,<br>
+              <strong>Everest Global Holdings Team</strong>
+            </p>
+          </div>
+
+          <!-- Footer -->
+          <div style="background: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+            <p style="color: #6b7280; font-size: 12px; margin: 0;">
+              This is an automated message from Everest Global Holdings.<br>
+              Please do not reply to this email.
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+  }
+
+  private static generateInvestmentMaturityText(user: UserData, investment: MaturedInvestmentData): string {
+    return `
+Investment Matured - Everest Global Holdings
+
+Dear ${user.full_name || user.email},
+
+Congratulations! Your investment has successfully matured and the returns have been added to your account balance.
+
+Investment Summary:
+- Investment: ${investment.investment_name}
+- Principal Amount: $${investment.amount_invested.toLocaleString()}
+- Returns Earned: +$${investment.expected_return_amount.toLocaleString()}
+- Total Payout: $${investment.total_return.toLocaleString()}
+- Maturity Date: ${new Date(investment.maturity_date).toLocaleDateString()}
+
+Funds Added: The total payout of $${investment.total_return.toLocaleString()} has been automatically added to your available balance. You can now reinvest these funds or request a withdrawal.
+
+Next Steps: 
+- View your updated balance in your dashboard
+- Consider reinvesting for continued growth
+- Request a withdrawal if you need access to funds
+
+Thank you for choosing Everest Global Holdings for your investment needs. We look forward to continuing to grow your wealth together.
+
+Best regards,
+Everest Global Holdings Team
+
+---
+This is an automated message from Everest Global Holdings.
+    `
+  }
+
+  private static generateMaturitySummaryHTML(investments: MaturedInvestmentData[], summary: string): string {
+    const totalInvestments = investments.length
+    const totalAmount = investments.reduce((sum, inv) => sum + inv.total_return, 0)
+    
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Daily Investment Maturity Summary</title>
+      </head>
+      <body style="margin: 0; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+          
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #1f2937, #374151); padding: 30px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 24px; font-weight: 600;">
+              📊 Daily Maturity Processing
+            </h1>
+            <p style="color: rgba(255, 255, 255, 0.9); margin: 8px 0 0 0; font-size: 14px;">
+              ${new Date().toLocaleDateString()} - Admin Summary
+            </p>
+          </div>
+
+          <!-- Content -->
+          <div style="padding: 30px;">
+            <div style="background: #f3f4f6; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+              <h3 style="color: #111827; margin: 0 0 16px 0; font-size: 18px; font-weight: 600;">
+                Processing Summary
+              </h3>
+              <div style="display: grid; gap: 8px;">
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #6b7280; font-weight: 500;">Investments Processed:</span>
+                  <span style="color: #111827; font-weight: 600;">${totalInvestments}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #6b7280; font-weight: 500;">Total Amount Paid:</span>
+                  <span style="color: #059669; font-weight: 600;">$${totalAmount.toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+
+            ${totalInvestments > 0 ? `
+            <h3 style="color: #111827; margin: 0 0 16px 0; font-size: 18px; font-weight: 600;">
+              Processed Investments
+            </h3>
+            <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+              ${investments.map((inv, index) => `
+              <div style="padding: 16px; ${index < investments.length - 1 ? 'border-bottom: 1px solid #e5e7eb;' : ''}">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <div style="font-weight: 600; color: #111827;">${inv.investment_name}</div>
+                    <div style="font-size: 14px; color: #6b7280;">${inv.user_email}</div>
+                  </div>
+                  <div style="text-align: right;">
+                    <div style="font-weight: 600; color: #059669;">$${inv.total_return.toLocaleString()}</div>
+                    <div style="font-size: 14px; color: #6b7280;">Matured: ${new Date(inv.maturity_date).toLocaleDateString()}</div>
+                  </div>
+                </div>
+              </div>
+              `).join('')}
+            </div>
+            ` : '<p style="color: #6b7280; font-style: italic;">No investments matured today.</p>'}
+
+            <div style="background: #EDE8D0; border-radius: 8px; padding: 16px; margin-top: 24px;">
+              <h4 style="color: #111827; margin: 0 0 8px 0; font-size: 16px; font-weight: 600;">System Status</h4>
+              <p style="color: #6b7280; font-size: 14px; margin: 0;">${summary}</p>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div style="background: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+            <p style="color: #6b7280; font-size: 12px; margin: 0;">
+              Automated system report from Everest Global Holdings<br>
+              Generated: ${new Date().toLocaleString()}
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+  }
+
+  private static generateMaturitySummaryText(investments: MaturedInvestmentData[], summary: string): string {
+    const totalInvestments = investments.length
+    const totalAmount = investments.reduce((sum, inv) => sum + inv.total_return, 0)
+    
+    return `
+Daily Investment Maturity Processing Summary - ${new Date().toLocaleDateString()}
+
+Processing Summary:
+- Investments Processed: ${totalInvestments}
+- Total Amount Paid: $${totalAmount.toLocaleString()}
+
+${totalInvestments > 0 ? `
+Processed Investments:
+${investments.map(inv => 
+  `- ${inv.investment_name} (${inv.user_email}): $${inv.total_return.toLocaleString()} - Matured: ${new Date(inv.maturity_date).toLocaleDateString()}`
+).join('\n')}
+` : 'No investments matured today.'}
+
+System Status: ${summary}
+
+---
+Automated system report from Everest Global Holdings
+Generated: ${new Date().toLocaleString()}
     `
   }
 }
