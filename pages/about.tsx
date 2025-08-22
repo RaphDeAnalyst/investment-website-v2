@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
-import { TrendingUp, Shield, Users, Star, Award, Target, Zap, Globe } from 'lucide-react'
+// Removed icon imports as per requirements
 import { ChatWidget } from '../components/ChatWidget'
 
 export default function AboutPage() {
@@ -65,7 +65,7 @@ export default function AboutPage() {
 
       <div className="min-h-screen bg-gray-50 overflow-x-hidden max-w-full">
         {/* Navigation */}
-        <nav className="fixed w-full top-0 bg-white/95 backdrop-blur-sm shadow-sm z-50 border-b border-gray-200">
+        <nav className="fixed w-full top-0 shadow-sm z-50 border-b border-gray-200" style={{backgroundColor: '#FFFFFF'}}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               {/* Logo */}
@@ -99,7 +99,7 @@ export default function AboutPage() {
               {/* Desktop Navigation */}
               <div className="hidden md:flex items-center space-x-8">
                 <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Home</Link>
-                <Link href="/about" className="text-blue-600 hover:text-blue-700 font-medium transition-colors">About Us</Link>
+                <Link href="/about" className="text-gray-900 hover:text-gray-900 font-medium transition-colors">About Us</Link>
                 <Link href="/plans" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Plans</Link>
                 <Link href="/industries" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Industries</Link>
                 <button
@@ -139,10 +139,10 @@ export default function AboutPage() {
 
           {/* Mobile Menu */}
           {mobileMenuOpen && (
-            <div className="md:hidden bg-white border-t border-gray-200 px-4 py-6">
+            <div className="md:hidden border-t border-gray-200 px-4 py-6" style={{backgroundColor: '#FFFFFF'}}>
               <div className="flex flex-col space-y-4">
                 <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>Home</Link>
-                <Link href="/about" className="text-blue-600 hover:text-blue-700 font-medium" onClick={() => setMobileMenuOpen(false)}>About Us</Link>
+                <Link href="/about" className="text-gray-900 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>About Us</Link>
                 <Link href="/plans" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>Plans</Link>
                 <Link href="/industries" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>Industries</Link>
                 <button
@@ -158,7 +158,7 @@ export default function AboutPage() {
                 <Link href="/signin" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>
                   Sign In
                 </Link>
-                <Link href="/signup" className="bg-blue-600 text-white px-4 py-2 rounded-2xl hover:bg-blue-700 font-medium text-center" onClick={() => setMobileMenuOpen(false)}>
+                <Link href="/signup" className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 font-medium text-center" onClick={() => setMobileMenuOpen(false)}>
                   Get Started
                 </Link>
               </div>
@@ -169,13 +169,13 @@ export default function AboutPage() {
         {/* Main Content */}
         <main className="pt-20">
           {/* Hero Section */}
-          <section className="py-20 bg-gray-600 text-white">
+          <section className="py-20 text-black" style={{backgroundColor: '#EDE8D0'}}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center">
                 <h1 className="text-4xl lg:text-6xl font-bold mb-6 leading-tight">
                   About Everest Global Holdings
                 </h1>
-                <p className="text-xl text-gray-200 mb-8 leading-relaxed max-w-3xl mx-auto">
+                <p className="text-xl text-gray-800 mb-8 leading-relaxed max-w-3xl mx-auto">
                   Your trusted partner in professional investment management, delivering exceptional returns through innovative strategies and cutting-edge technology.
                 </p>
               </div>
@@ -187,15 +187,12 @@ export default function AboutPage() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
                 {[
-                  { icon: Users, value: '10,000+', label: 'Trusted Investors' },
-                  { icon: TrendingUp, value: '$2.5B', label: 'Assets Under Management' },
-                  { icon: Award, value: '15+', label: 'Years of Excellence' },
-                  { icon: Star, value: '4.9/5', label: 'Client Satisfaction' }
+                  { value: '10,000+', label: 'Trusted Investors' },
+                  { value: '$2.5B', label: 'Assets Under Management' },
+                  { value: '15+', label: 'Years of Excellence' },
+                  { value: '4.9/5', label: 'Client Satisfaction' }
                 ].map((stat, index) => (
                   <div key={index} className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all hover:-translate-y-2 border border-gray-200">
-                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <stat.icon size={28} className="text-blue-600" />
-                    </div>
                     <div className="text-4xl font-bold text-gray-900 mb-2">
                       {stat.value}
                     </div>
@@ -209,7 +206,7 @@ export default function AboutPage() {
           </section>
 
           {/* Our Story Section */}
-          <section className="py-20 bg-gray-100">
+          <section className="py-20" style={{backgroundColor: '#EDE8D0'}}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="grid lg:grid-cols-2 gap-16 items-center">
                 <div>
@@ -259,15 +256,12 @@ export default function AboutPage() {
               
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                 {[
-                  { icon: Shield, title: 'Proven Track Record', desc: 'Consistent outperformance with 98.5% success rate' },
-                  { icon: Target, title: 'Tailored Strategies', desc: 'Customized investment plans for every risk profile' },
-                  { icon: Zap, title: 'Advanced Technology', desc: 'AI-powered analytics and real-time monitoring' },
-                  { icon: Globe, title: 'Global Reach', desc: 'Diversified portfolio across 6 major industries' }
+                  { title: 'Proven Track Record', desc: 'Consistent outperformance with 98.5% success rate' },
+                  { title: 'Tailored Strategies', desc: 'Customized investment plans for every risk profile' },
+                  { title: 'Advanced Technology', desc: 'AI-powered analytics and real-time monitoring' },
+                  { title: 'Global Reach', desc: 'Diversified portfolio across 6 major industries' }
                 ].map((item, index) => (
                   <div key={index} className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all hover:-translate-y-2 border border-gray-200 text-center">
-                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <item.icon size={28} className="text-blue-600" />
-                    </div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-4">
                       {item.title}
                     </h3>
@@ -281,7 +275,7 @@ export default function AboutPage() {
           </section>
 
           {/* Trusted Partners Carousel Section */}
-        <section className="py-16 bg-gray-50 overflow-hidden">
+        <section className="py-16 bg-white overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Trusted Partners</h2>
@@ -365,7 +359,7 @@ export default function AboutPage() {
         </section>
 
           {/* Mission & Vision Section */}
-          <section className="py-20 bg-gray-100">
+          <section className="py-20" style={{backgroundColor: '#EDE8D0'}}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-16">
                 <h2 className="text-4xl font-bold text-gray-900 mb-4">Mission & Vision</h2>
@@ -376,9 +370,6 @@ export default function AboutPage() {
 
               <div className="grid lg:grid-cols-2 gap-8">
                 <div className="bg-white rounded-2xl p-10 shadow-lg hover:shadow-xl transition-all hover:-translate-y-2 border border-gray-200 text-center">
-                  <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Target size={36} className="text-blue-600" />
-                  </div>
                   <h3 className="text-2xl font-semibold text-gray-900 mb-4">
                     Our Mission
                   </h3>
@@ -388,9 +379,6 @@ export default function AboutPage() {
                 </div>
 
                 <div className="bg-white rounded-2xl p-10 shadow-lg hover:shadow-xl transition-all hover:-translate-y-2 border border-gray-200 text-center">
-                  <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Globe size={36} className="text-blue-600" />
-                  </div>
                   <h3 className="text-2xl font-semibold text-gray-900 mb-4">
                     Our Vision
                   </h3>
@@ -454,19 +442,19 @@ export default function AboutPage() {
           </section>
 
           {/* CTA Section */}
-          <section className="py-20 bg-gray-600 text-white">
+          <section className="py-20 bg-white text-black" style={{backgroundColor: '#ffffffff'}}>
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
               <h2 className="text-4xl font-bold mb-6">Ready to Start Your Investment Journey?</h2>
-              <p className="text-xl mb-8 text-gray-200">
+              <p className="text-xl mb-8 text-gray-800">
                 Join thousands of investors who trust us with their financial future. Let's build your wealth together.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/signup" className="bg-white text-gray-900 px-8 py-4 rounded-2xl font-semibold hover:bg-gray-100 transition-colors text-center">
+                <Link href="/signup" className="bg-gray-700 text-white px-8 py-4 rounded-2xl font-semibold hover:bg-gray-800 transition-colors text-lg">
                   Get Started Today
                 </Link>
                 <button
                   onClick={() => setContactFormOpen(true)}
-                  className="border-2 border-white text-white px-8 py-4 rounded-2xl font-semibold hover:bg-white hover:text-gray-900 transition-colors"
+                  className="border-2 border-black text-black px-8 py-4 rounded-2xl font-semibold hover:bg-white hover:text-black transition-colors"
                 >
                   Contact Us
                 </button>
@@ -476,7 +464,7 @@ export default function AboutPage() {
         </main>
 
         {/* Footer */}
-        <footer className="bg-gray-100 text-gray-800 py-8">
+        <footer className="text-gray-800 py-8" style={{backgroundColor: '#EDE8D0'}}>
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
       <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4">
@@ -550,7 +538,7 @@ export default function AboutPage() {
                       required
                       value={contactForm.name}
                       onChange={(e) => setContactForm(prev => ({ ...prev, name: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                       placeholder="Your full name"
                     />
                   </div>
@@ -562,7 +550,7 @@ export default function AboutPage() {
                       required
                       value={contactForm.email}
                       onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                       placeholder="your.email@example.com"
                     />
                   </div>
@@ -589,7 +577,7 @@ export default function AboutPage() {
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      className="flex-1 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
                     >
                       Send Message
                     </button>

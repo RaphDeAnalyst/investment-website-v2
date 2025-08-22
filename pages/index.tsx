@@ -130,7 +130,7 @@ const goToSlide = (slideIndex: number) => {
 
       <div className="page-wrapper">
         {/* Navigation */}
-        <nav className="fixed w-full top-0 bg-white/95 backdrop-blur-sm shadow-sm z-50 border-b border-gray-200">
+        <nav className="fixed w-full top-0 shadow-sm z-50 border-b border-gray-200" style={{backgroundColor: '#FFFFFF'}}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center">
@@ -195,7 +195,7 @@ const goToSlide = (slideIndex: number) => {
 
           {/* Mobile Menu */}
           {mobileMenuOpen && (
-            <div className="md:hidden bg-white border-t border-gray-200 px-4 py-6">
+            <div className="md:hidden border-t border-gray-200 px-4 py-6" style={{backgroundColor: '#FFFFFF'}}>
               <div className="flex flex-col space-y-4">
                 <a href="#home" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>Home</a>
                 <a href="#about" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>About</a>
@@ -236,7 +236,7 @@ const goToSlide = (slideIndex: number) => {
                 }`}
               >
                 <img src={image} alt={`Hero ${index + 1}`} className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-r from-gray-600/80 via-blue-600/60 to-gray-900/80"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-black/60"></div>
               </div>
             ))}
           </div>
@@ -252,7 +252,7 @@ const goToSlide = (slideIndex: number) => {
                   Partner with Everest Global Holdings for strategic investment solutions that deliver consistent returns across diverse market conditions.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Link href="/signup" className="bg-blue-600 text-white px-8 py-4 rounded-2xl font-semibold hover:bg-blue-700 transition-colors text-center">
+                  <Link href="/signup" className="px-8 py-4 rounded-2xl font-semibold transition-colors text-center text-gray-900 hover:bg-gray-100" style={{backgroundColor: '#FFFFFF'}}>
                     Start Investing
                   </Link>
                 </div>
@@ -275,56 +275,56 @@ const goToSlide = (slideIndex: number) => {
         </section>
 
         {/* Features Section - Why Choose Us */}
-        <section className="section-padding container-responsive border-b border-gray-200">
+        <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-b border-gray-200">
           <div className="text-center mb-16">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-800 mb-4">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
               WHY CHOOSE US?
             </h2>
-            <p className="text-lg sm:text-xl text-slate-600 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
               We provide secure, transparent, and profitable investment opportunities designed for modern investors.
             </p>
           </div>
           
           {/* Feature Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            <div className="card-base p-6 sm:p-8 text-center">
-              <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-                <svg className="w-6 h-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="bg-white rounded-xl p-6 sm:p-8 text-center shadow-sm hover:shadow-md transition-shadow border border-gray-200">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{backgroundColor: '#EDE8D0'}}>
+                <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                 </svg>
               </div>
-              <h3 className="text-lg sm:text-xl font-semibold text-slate-800 mb-3">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3">
                 Guaranteed Returns
               </h3>
-              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+              <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
                 Earn 2.5% to 5% returns on your investments with our proven strategies and risk management approach.
               </p>
             </div>
 
-            <div className="card-base p-6 sm:p-8 text-center">
-              <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-                <svg className="w-6 h-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="bg-white rounded-xl p-6 sm:p-8 text-center shadow-sm hover:shadow-md transition-shadow border border-gray-200">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{backgroundColor: '#EDE8D0'}}>
+                <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
-              <h3 className="text-lg sm:text-xl font-semibold text-slate-800 mb-3">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3">
                 Secure Platform
               </h3>
-              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+              <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
                 Your investments are protected with bank-level security measures and regulatory compliance.
               </p>
             </div>
 
-            <div className="card-base p-6 sm:p-8 text-center">
-              <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-                <svg className="w-6 h-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="bg-white rounded-xl p-6 sm:p-8 text-center shadow-sm hover:shadow-md transition-shadow border border-gray-200">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{backgroundColor: '#EDE8D0'}}>
+                <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h3 className="text-lg sm:text-xl font-semibold text-slate-800 mb-3">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3">
                 Quick Returns
               </h3>
-              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+              <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
                 Get your returns in as little as 5 days with our flexible short-term investment plans.
               </p>
             </div>
@@ -332,7 +332,7 @@ const goToSlide = (slideIndex: number) => {
         </section>
 
         {/* About Section */}
-      <section id="about" className="py-20 bg-gray-50">
+      <section id="about" className="py-20" style={{backgroundColor: '#EDE8D0'}}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -515,7 +515,7 @@ const goToSlide = (slideIndex: number) => {
         </section>
 
         {/* Expertise & Industries */}
-        <section id="expertise" className="py-20 bg-gray-50">
+        <section id="expertise" className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Investment Expertise</h2>
@@ -743,7 +743,7 @@ const goToSlide = (slideIndex: number) => {
                     </div>
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-1">{member.name}</h3>
-                  <p className="text-sm text-blue-600 mb-2">{member.role}</p>
+                  <p className="text-sm mb-2" style={{color: '#C9C5B1'}}>{member.role}</p>
                   <p className="text-xs text-gray-500">{member.desc}</p>
                 </div>
               ))}
@@ -753,7 +753,7 @@ const goToSlide = (slideIndex: number) => {
 
         {/* Testimonials */}
         {/* Testimonials Section */}
-        <section className="py-20 bg-gray-50">
+        <section className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold text-gray-900 mb-4">Client Success Stories</h2>
@@ -818,19 +818,19 @@ const goToSlide = (slideIndex: number) => {
 
         {/* CTA Section */}
         {/* CTA Section */}
-        <section className="py-20 bg-gray-600 text-white">
+        <section className="py-20 text-black" style={{backgroundColor: '#C9C5B1'}}>
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-4xl font-bold mb-6">Ready to Start Your Investment Journey?</h2>
-            <p className="text-xl mb-8 text-gray-200">
+            <p className="text-xl mb-8 text-gray-800">
               Join thousands of investors who trust Everest Global Holdings for their financial growth.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/signup" className="bg-white text-gray-900 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+              <Link href="/signup" className="bg-white text-black px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
                 Start Investing Today
               </Link>
               <button
                 onClick={() => setContactFormOpen(true)}
-                className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-gray-900 transition-colors"
+                className="border-2 border-black text-black px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-black transition-colors"
               >
                 Contact Us
               </button>
@@ -840,7 +840,7 @@ const goToSlide = (slideIndex: number) => {
 
         {/* Footer */}
        {/* Footer */}
-      <footer className="bg-gray-100 text-gray-800 py-8">
+      <footer className="text-gray-800 py-8" style={{backgroundColor: '#EDE8D0'}}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             {/* Logo and Company Info */}

@@ -65,7 +65,7 @@ export default function InvestmentPlansPage() {
 
       <div className="min-h-screen bg-gray-50 overflow-x-hidden max-w-full">
         {/* Navigation */}
-        <nav className="fixed w-full top-0 bg-white/95 backdrop-blur-sm shadow-sm z-50 border-b border-gray-200">
+        <nav className="fixed w-full top-0 shadow-sm z-50 border-b border-gray-200" style={{backgroundColor: '#FFFFFF'}}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               {/* Logo - Bigger than homepage */}
@@ -100,7 +100,7 @@ export default function InvestmentPlansPage() {
               <div className="hidden md:flex items-center space-x-8">
                 <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Home</Link>
                 <Link href="/about" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">About Us</Link>
-                <Link href="/plans" className="text-blue-600 hover:text-blue-700 font-medium transition-colors">Investment Plans</Link>
+                <Link href="/plans" className="text-gray-900 hover:text-gray-900 font-medium transition-colors">Investment Plans</Link>
                 <Link href="/industries" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Industries</Link>
                 <button
                   onClick={() => setContactFormOpen(true)}
@@ -139,11 +139,11 @@ export default function InvestmentPlansPage() {
 
           {/* Mobile Menu */}
           {mobileMenuOpen && (
-            <div className="md:hidden bg-white border-t border-gray-200 px-4 py-6">
+            <div className="md:hidden border-t border-gray-200 px-4 py-6" style={{backgroundColor: '#FFFFFF'}}>
               <div className="flex flex-col space-y-4">
                 <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>Home</Link>
                 <Link href="/about" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>About Us</Link>
-                <Link href="/plans" className="text-blue-600 hover:text-blue-700 font-medium" onClick={() => setMobileMenuOpen(false)}>Investment Plans</Link>
+                <Link href="/plans" className="text-gray-900 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>Investment Plans</Link>
                 <Link href="/industries" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>Industries</Link>
                 <button
                   onClick={() => {
@@ -158,7 +158,7 @@ export default function InvestmentPlansPage() {
                 <Link href="/signin" className="text-gray-700 hover:text-gray-900 font-medium" onClick={() => setMobileMenuOpen(false)}>
                   Sign In
                 </Link>
-                <Link href="/signup" className="bg-blue-600 text-white px-4 py-2 rounded-2xl hover:bg-blue-700 font-medium text-center" onClick={() => setMobileMenuOpen(false)}>
+                <Link href="/signup" className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 font-medium text-center" onClick={() => setMobileMenuOpen(false)}>
                   Get Started
                 </Link>
               </div>
@@ -169,26 +169,23 @@ export default function InvestmentPlansPage() {
         {/* Main Content */}
         <main className="pt-20">
           {/* Hero Section */}
-          <section className="py-20 bg-gray-600 text-white">
+          <section className="py-20 text-black" style={{backgroundColor: '#EDE8D0'}}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center max-w-4xl mx-auto">
                 <h1 className="text-4xl lg:text-6xl font-bold mb-6 leading-tight">
                   Our Investment Plans
                 </h1>
-                <p className="text-xl text-white-100 mb-8 leading-relaxed">
+                <p className="text-xl text-gray-800 mb-8 leading-relaxed">
                   Choose from our carefully structured investment plans designed to maximize your returns with guaranteed daily profits and flexible investment periods.
                 </p>
-                <div className="flex items-center justify-center space-x-8 text-blue-200">
+                <div className="flex items-center justify-center space-x-8 text-gray-800">
                   <div className="flex items-center space-x-2">
-                    <Shield className="w-5 h-5" />
                     <span className="text-sm">100% Secure</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <TrendingUp className="w-5 h-5" />
                     <span className="text-sm">Guaranteed Returns</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Clock className="w-5 h-5" />
                     <span className="text-sm">Quick Payouts</span>
                   </div>
                 </div>
@@ -204,11 +201,11 @@ export default function InvestmentPlansPage() {
                 {/* Compact Plan */}
                 <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-3 border-2 border-gray-200 relative">
                   <div className="text-center mb-8">
-                    <div className="w-20 h-20 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                      <Zap className="w-10 h-10 text-blue-600" />
+                    <div className="w-20 h-20 rounded-2xl bg-gray-900 flex items-center justify-center mx-auto mb-6">
+                      <span className="text-2xl font-bold text-white">C</span>
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">Compact Plan</h3>
-                    <div className="text-5xl font-bold text-blue-600 mb-2">2.5%</div>
+                    <div className="text-5xl font-bold text-gray-900 mb-2">2.5%</div>
                     <div className="text-gray-500 text-lg">Daily Return</div>
                   </div>
                   
@@ -231,7 +228,7 @@ export default function InvestmentPlansPage() {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Total Return:</span>
-                          <span className="font-semibold text-blue-600">12.5%</span>
+                          <span className="font-semibold text-gray-900">12.5%</span>
                         </div>
                       </div>
                     </div>
@@ -249,7 +246,7 @@ export default function InvestmentPlansPage() {
                           'Instant withdrawals'
                         ].map((feature, index) => (
                           <li key={index} className="flex items-center">
-                            <CheckCircle className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0" />
+                            <CheckCircle className="w-5 h-5 mr-3 flex-shrink-0 text-gray-600" />
                             <span className="text-gray-700">{feature}</span>
                           </li>
                         ))}
@@ -257,29 +254,29 @@ export default function InvestmentPlansPage() {
                     </div>
                   </div>
                   
-                  <Link href="/signup" className="w-full bg-blue-600 text-white py-4 rounded-2xl hover:bg-blue-700 font-semibold transition-colors text-center block text-lg">
+                  <Link href="/signup" className="w-full bg-gray-700 text-white py-4 rounded-2xl hover:bg-gray-800 font-semibold transition-colors text-center block text-lg">
                     Start Investing
                   </Link>
                 </div>
 
                 {/* Master Plan - Featured */}
-                <div className="bg-white rounded-2xl p-8 shadow-2xl border-2 border-blue-600 relative hover:shadow-2xl transition-all hover:-translate-y-3 transform scale-105">
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-8 py-2 rounded-full text-sm font-semibold">
+                <div className="bg-white rounded-2xl p-8 shadow-2xl border-2 border-gray-900 relative hover:shadow-2xl transition-all hover:-translate-y-3 transform scale-105">
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-8 py-2 rounded-full text-sm font-semibold">
                     Most Popular
                   </div>
                   
                   <div className="text-center mb-8">
-                    <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                      <Star className="w-10 h-10 text-white" />
+                    <div className="w-20 h-20 rounded-2xl bg-gray-900 flex items-center justify-center mx-auto mb-6">
+                      <span className="text-2xl font-bold text-white">M</span>
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">Master Plan</h3>
-                    <div className="text-5xl font-bold text-blue-600 mb-2">3.5%</div>
+                    <div className="text-5xl font-bold text-gray-900 mb-2">3.5%</div>
                     <div className="text-gray-500 text-lg">Daily Return</div>
                   </div>
                   
                   <div className="space-y-6 mb-8">
                     {/* Investment Details */}
-                    <div className="bg-blue-50 rounded-xl p-6">
+                    <div className="rounded-xl p-6" style={{backgroundColor: '#ffffffff'}}>
                       <h4 className="font-semibold text-gray-900 mb-4">Investment Details</h4>
                       <div className="space-y-3">
                         <div className="flex justify-between">
@@ -296,7 +293,7 @@ export default function InvestmentPlansPage() {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Total Return:</span>
-                          <span className="font-semibold text-blue-600">35%</span>
+                          <span className="font-semibold text-gray-900">35%</span>
                         </div>
                       </div>
                     </div>
@@ -315,7 +312,7 @@ export default function InvestmentPlansPage() {
                           'Personal account manager'
                         ].map((feature, index) => (
                           <li key={index} className="flex items-center">
-                            <CheckCircle className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0" />
+                            <CheckCircle className="w-5 h-5 mr-3 flex-shrink-0 text-gray-600" />
                             <span className="text-gray-700">{feature}</span>
                           </li>
                         ))}
@@ -323,7 +320,7 @@ export default function InvestmentPlansPage() {
                     </div>
                   </div>
                   
-                  <Link href="/signup" className="w-full bg-blue-600 text-white py-4 rounded-2xl hover:bg-blue-700 font-semibold transition-colors text-center block text-lg">
+                  <Link href="/signup" className="w-full bg-gray-700 text-white py-4 rounded-2xl hover:bg-gray-800 font-semibold transition-colors text-center block text-lg">
                     Start Investing
                   </Link>
                 </div>
@@ -331,8 +328,8 @@ export default function InvestmentPlansPage() {
                 {/* Ultimate Plan */}
                 <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-3 border-2 border-gray-200 relative">
                   <div className="text-center mb-8">
-                    <div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                      <TrendingUp className="w-10 h-10 text-gray-600" />
+                    <div className="w-20 h-20 rounded-2xl bg-gray-900 flex items-center justify-center mx-auto mb-6">
+                      <span className="text-2xl font-bold text-white">U</span>
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">Ultimate Plan</h3>
                     <div className="text-5xl font-bold text-gray-700 mb-2">5.0%</div>
@@ -395,7 +392,7 @@ export default function InvestmentPlansPage() {
           </section>
 
           {/* How It Works Section */}
-          <section className="py-20 bg-gray-100">
+          <section className="py-20" style={{backgroundColor: '#EDE8D0'}}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-16">
                 <h2 className="text-4xl font-bold text-gray-900 mb-4">How It Works</h2>
@@ -432,10 +429,9 @@ export default function InvestmentPlansPage() {
                   }
                 ].map((item, index) => (
                   <div key={index} className="text-center bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all hover:-translate-y-2">
-                    <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <div className="w-16 h-16 rounded-full bg-gray-900 flex items-center justify-center mx-auto mb-6">
                       <span className="text-2xl font-bold text-white">{item.step}</span>
                     </div>
-                    <div className="text-4xl mb-4">{item.icon}</div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-3">{item.title}</h3>
                     <p className="text-gray-600 leading-relaxed">{item.description}</p>
                   </div>
@@ -445,16 +441,17 @@ export default function InvestmentPlansPage() {
           </section>
 
           {/* FAQ Section */}
-          <section className="py-20 bg-gray-600 text-white">
+          <section className="py-20 text-black" style={{backgroundColor: '#ffffffff'}}>
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-12">
                 <h2 className="text-4xl font-bold mb-4">Didn't find your answer?</h2>
-                <p className="text-xl text-white-200 mb-8">
+                <p className="text-xl text-gray-800 mb-8">
                   Our investment experts are here to help you make the right choice
                 </p>
                 <button
                   onClick={() => setContactFormOpen(true)}
-                  className="bg-white text-blue-900 px-8 py-4 rounded-2xl font-semibold hover:bg-gray-100 transition-colors text-lg"
+                  className="bg-gray-700 text-white px-8 py-4 rounded-2xl font-semibold hover:bg-gray-800 transition-colors text-lg"
+                  // w-full bg-gray-700 text-white py-4 rounded-2xl hover:bg-gray-800 font-semibold transition-colors text-center block text-lg
                 >
                   Contact Us
                 </button>
@@ -464,7 +461,7 @@ export default function InvestmentPlansPage() {
         </main>
 
      {/* Footer */}
-<footer className="bg-gray-100 text-gray-800 py-8">
+<footer className="text-gray-800 py-8" style={{backgroundColor: '#EDE8D0'}}>
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
       <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4">
@@ -541,7 +538,7 @@ export default function InvestmentPlansPage() {
                       required
                       value={contactForm.name}
                       onChange={(e) => setContactForm(prev => ({ ...prev, name: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                       placeholder="Your full name"
                     />
                   </div>
@@ -553,7 +550,7 @@ export default function InvestmentPlansPage() {
                       required
                       value={contactForm.email}
                       onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                       placeholder="your.email@example.com"
                     />
                   </div>
@@ -580,7 +577,7 @@ export default function InvestmentPlansPage() {
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      className="flex-1 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
                     >
                       Send Message
                     </button>
