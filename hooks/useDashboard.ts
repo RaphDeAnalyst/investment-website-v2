@@ -130,7 +130,7 @@ export function useDashboard() {
     }
   }, [supabase])
 
-  const fetchTransactions = useCallback(async (userId: string, limit = 10) => {
+    const fetchTransactions = useCallback(async (userId: string, limit = 10) => {
     try {
       console.log('📋 Fetching transactions for user:', userId)
       const { data, error } = await supabase
