@@ -127,19 +127,19 @@ export default function Investment() {
   }> = {
     btc: {
       name: 'Bitcoin (BTC)',
-      address: '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa',
+      address: 'bc1qmeljv3lhtmvyew2cw8zgkcwjl2gsd08tp5d6cz',
       icon: '₿',
       network: 'Bitcoin Network'
     },
     usdt_bep20: {
       name: 'USDT (BEP20)',
-      address: '0x742d35Cc6634C0532925a3b8D7389a8C0e2e4f0e',
+      address: '0xb14D7Ee1D74D549e51b4B3A2b79FcC6Ba428072B',
       icon: '₮',
       network: 'Binance Smart Chain'
     },
     usdt_erc20: {
       name: 'USDT (ERC20)',
-      address: '0x742d35Cc6634C0532925a3b8D7389a8C0e2e4f0e',
+      address: '0xb14D7Ee1D74D549e51b4B3A2b79FcC6Ba428072B',
       icon: '₮',
       network: 'Ethereum Network'
     }
@@ -263,8 +263,8 @@ export default function Investment() {
     const dailyRate = calculator.selectedPlan.interestRate / 100
     const days = calculator.selectedPlan.duration
     
-    // Calculate daily compound interest: A = P(1 + r)^t
-    const total = amount * Math.pow(1 + dailyRate, days)
+    // Calculate daily simple interest: A = P(1 + r*t)
+    const total = amount * (1 + dailyRate * days)
     const profit = total - amount
     
     return { profit, total }
@@ -364,7 +364,7 @@ export default function Investment() {
       // Calculate expected return based on the final amount, not calculator amount
       const dailyRate = calculator.selectedPlan.interestRate / 100
       const days = calculator.selectedPlan.duration
-      const total = finalAmount * Math.pow(1 + dailyRate, days)
+      const total = finalAmount * (1 + dailyRate * days)
       const profit = total - finalAmount
 
       const submissionData = {
@@ -715,7 +715,7 @@ export default function Investment() {
                                   <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#059669">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                   </svg>
-                                  {feature.replace('guaranteed returns', 'daily compound returns')}
+                                  {feature.replace('guaranteed returns', 'daily simple returns')}
                                 </li>
                               ))}
                             </ul>
@@ -796,7 +796,7 @@ export default function Investment() {
                           {calculator.amount && isValidAmount() && (
                             <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4 mb-6">
                               <h4 className="text-base font-semibold text-green-800 mb-4">
-                                Investment Summary (Daily Compound Interest)
+                                Investment Summary (Daily Simple Interest)
                               </h4>
                               <div className="space-y-3">
                                 <div className="flex justify-between items-center">
