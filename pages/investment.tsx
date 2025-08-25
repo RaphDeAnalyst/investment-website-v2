@@ -285,6 +285,9 @@ export default function Investment() {
   const proceedToPayment = async () => {
     if (!isValidAmount()) return
     
+    // Auto-fill payment amount with calculator amount
+    setPaymentForm(prev => ({ ...prev, customAmount: calculator.amount }))
+    
     // Don't close calculator yet - we need selectedPlan for submission
     setCalculator(prev => ({ ...prev, isOpen: false })) // Only close the modal
     setPayment({ ...payment, isOpen: true, loading: true })
@@ -943,7 +946,6 @@ export default function Investment() {
                                       Important Payment Instructions
                                     </h4>
                                     <ul className="mt-2 pl-5 text-yellow-800 text-sm leading-relaxed list-disc">
-                                      <li>Send the exact amount shown below</li>
                                       <li>Use only the provided wallet address</li>
                                       <li>Double-check the network before sending</li>
                                       <li>Save your transaction hash for verification</li>
@@ -980,23 +982,30 @@ export default function Investment() {
                                             
                                             {/* BTC Equivalent Display */}
                                             {payment.btcRate > 0 && paymentForm.customAmount && parseFloat(paymentForm.customAmount) > 0 ? (
-                                              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                                                <div className="flex justify-between items-center mb-1">
-                                                  <span className="text-sm text-blue-800 font-medium">
-                                                    BTC Equivalent:
-                                                  </span>
-                                                  <span className="text-base font-bold text-blue-800">
-                                                    {formatBTC(parseFloat(paymentForm.customAmount) / payment.btcRate)}
-                                                  </span>
+                                              <>
+                                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                                                  <div className="flex justify-between items-center mb-1">
+                                                    <span className="text-sm text-blue-800 font-medium">
+                                                      BTC Equivalent:
+                                                    </span>
+                                                    <span className="text-base font-bold text-blue-800">
+                                                      {formatBTC(parseFloat(paymentForm.customAmount) / payment.btcRate)}
+                                                    </span>
+                                                  </div>
+                                                  <div className="text-xs text-gray-600">
+                                                    Rate: ${payment.btcRate.toLocaleString()} per BTC
+                                                  </div>
                                                 </div>
-                                                <div className="text-xs text-gray-600">
-                                                  Rate: ${payment.btcRate.toLocaleString()} per BTC
+                                                <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-3">
+                                                  <div className="text-sm font-medium text-green-800">
+                                                    Send the exact BTC amount shown above
+                                                  </div>
                                                 </div>
-                                              </div>
+                                              </>
                                             ) : payment.btcRate > 0 ? (
                                               <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
                                                 <div className="text-xs text-gray-600">
-                                                  Enter amount above to see BTC equivalent
+                                                  Send the exact BTC amount shown here
                                                 </div>
                                               </div>
                                             ) : (

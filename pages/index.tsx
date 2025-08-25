@@ -5,10 +5,12 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { useAuth } from '../hooks/useAuth'
 import { ChatWidget } from '../components/ChatWidget'
+import { useGlobalPopup } from '../components/ui/PopupProvider'
 
 export default function HomePage() {
   const { user, loading } = useAuth()
   const router = useRouter()
+  const { showSuccess, showError } = useGlobalPopup()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [testimonialIndex, setTestimonialIndex] = useState(0)
   const [contactFormOpen, setContactFormOpen] = useState(false)
@@ -95,12 +97,19 @@ const goToSlide = (slideIndex: number) => {
       
       setContactForm({ name: '', email: '', message: '' })
       setContactFormOpen(false)
-      alert('Thank you for your message! We have received it and will get back to you soon.')
+      showSuccess(
+        'Message Sent!',
+        'Thank you for your message! We have received it and will get back to you soon.',
+        4000
+      )
       
     } catch (error: unknown) {
       console.error('❌ Contact form submission error:', error)
       const errorMessage = (error as Error)?.message || 'Sorry, there was an error sending your message. Please try again.'
-      alert(errorMessage)
+      showError(
+        'Message Failed',
+        errorMessage
+      )
     }
   }
 
