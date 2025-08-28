@@ -149,7 +149,7 @@ export function useAuth() {
         setProfile(mockProfile)
       } else {
         console.log('✅ Profile loaded successfully')
-        setProfile(data)
+        setProfile(data as Profile)
       }
     } catch (err: any) {
       console.error('❌ Profile fetch error:', err)
